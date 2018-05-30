@@ -23,8 +23,8 @@ public class SessionData {
 
     ServerData serverData;
     ClientData clientData;
-    String thirdSession;
     String openGId;
+    String thirdSession;
     long expiretime;
 
 }

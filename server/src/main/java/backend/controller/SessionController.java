@@ -136,8 +136,10 @@ public class SessionController {
                             sessionData.setOpenGId(groupInfo.getString("openGId"));
                         }
                     }
-                    sessionService.addNewSession(serverData.getOpenid(), sessionData);
                     Debug.Log("sessionData: " + sessionData.toString());
+                    String thirdSessionKey = sessionService.addNewSession(serverData.getOpenid(), sessionData);
+                    outString = "{ status: ok, thirdSessionKey: " + thirdSessionKey + "}";
+                    return new JSONObject(outString).toString();
                 } catch(BadPaddingException e) {
                     e.printStackTrace();
                     outString = "Bad encrypted data.";

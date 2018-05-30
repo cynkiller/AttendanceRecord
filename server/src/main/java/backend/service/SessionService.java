@@ -13,44 +13,68 @@ import backend.util.Debug;
 @Configuration
 public class SessionService {
     private HashMap<String, SessionData> session = new HashMap<String, SessionData>();
+    private HashMap<String, String> idKeyMap = new HashMap<String, String>();
 
     private String generateSessionKey() {
         String uuid = UUID.randomUUID().toString();
         Debug.Log("New session key " + uuid + "generated.");
         return uuid;
     }
+
+    private Boolean sessionExpired(String openid) {
+        if ( !sessionExist(openid)) {
+            return true;
+        }
+        SessionData sd = session.get(openid);
+        long expiretime = sd.getExpiretime();
+        long currenttime = Debug.getTimestamp();
+        if (currenttime >= expiretime) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean sessionExist(String openid) {
         if (session.get(openid) != null)
             return true;
         return false;
     }
 
-    public String getThirdSession(String openid) {
-        SessionData sd = session.get(openid);
-        if (sd != null) {
-            // Check if 3rdsession exists
-            String thirdSessionKey = sd.getThirdSession();
-            if ( thirdSessionKey != null) {
-                return thirdSessionKey;
-            }
-            //generate 3rdsession
-            thirdSessionKey = generateSessionKey();
-            //Store in session
-            sd.setThirdSession(thirdSessionKey);
-            session.replace(openid, sd);
-            return thirdSessionKey;
-        }
-        return null;
+    /**
+     * Assumption: openid not registered
+     */
+    public SessionData getThirdSession(String openid, SessionData sd) {
+        // Assumption: openid not registered
+        assert sessionExist(openid) == false;
+
+        // Initialise
+        SessionData newsd = new SessionData();
+        newsd.setServerData(sd.getServerData());
+        newsd.setClientData(sd.getClientData());
+        newsd.setOpenGId(sd.getOpenGId());
+
+        // Generate 3rd session key
+        String thirdSessionKey = generateSessionKey();
+        newsd.setThirdSession(thirdSessionKey);
+
+        // Calculate expire time
+        long expire = sd.getServerData().getExpires_in();
+        newsd.setExpiretime(Debug.getTimestamp() + expire * 1000); // milisecond need to multiply with 1000
+        return newsd;
     }
 
-    public boolean addNewSession(String openid, SessionData sd) {
+    public String addNewSession(String openid, SessionData sd) {
         Debug.Log("Current timestamp: " + Debug.getTimestamp());
         Debug.Log("Current time: " + Debug.getDatetime());
-        if (sessionExist(openid)) {
-            Debug.Log(openid + "already exists!", "ERROR");
-            return true;
+        Debug.Log("openid: " + openid);
+        if (sessionExist(openid) && !sessionExpired(openid)) {
+            Debug.Log(openid + " exists!", "INFO");
+            return session.get(openid).getThirdSession();
         }
-        session.put(openid, sd);
-        return false;
+        SessionData newsd = getThirdSession(openid, sd);
+        session.put(openid, newsd);
+        idKeyMap.put(newsd.getThirdSession(), openid);
+        Debug.Log(session);
+        return session.get(openid).getThirdSession();
     }
 }
