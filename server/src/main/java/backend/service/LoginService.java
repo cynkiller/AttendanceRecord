@@ -2,18 +2,41 @@ package backend.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Formatter;
 import java.util.HashMap;
+import java.io.IOException;
+import java.util.Base64;
+import org.json.JSONObject;
+
 import java.net.URL;
 import java.net.URLConnection;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
-import org.json.JSONException;
-import org.json.JSONObject; 
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.Arrays;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+import java.security.Security;
+import javax.crypto.NoSuchPaddingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.InvalidKeyException;
+import javax.crypto.IllegalBlockSizeException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import javax.crypto.BadPaddingException;
+
+import backend.util.Debug;
 
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -24,24 +47,30 @@ public class LoginService {
     @Value("${miniprogram.auth.url}") String authurl;
 
     /**
-     * get miniprogram session_key and openid
+     * get miniprogram session_key and openid, expire_in
      * session_key for decode encrypteddata
      * openid for user identification
      *
      * @author cynkiller
      * @param code from login callback
      * @return
-     * @throws JSONException 
+     * @throws IOException JsonParseException JsonMappingException
      */
-    public String getSessionKeyOropenid(String code) throws JSONException{
-        JSONObject requestUrlParam = new JSONObject();
+    public String getWeixinOpenidAndSessionkey(String code) throws IOException {
         String requestUrl = authurl;
+        String grant_type = "authorization_code";
+        Debug.Log(  "appid: " + appid +
+                " appsecret: " + appsecret +
+                " js_code: " + code +
+                " authurl: " + authurl);
+
+        /* POST WAY
+        JSONObject requestUrlParam = new JSONObject();
         requestUrlParam.put("appid", appid);
         requestUrlParam.put("secret", appsecret);
         requestUrlParam.put("js_code", code);
         requestUrlParam.put("grant_type", "authorization_code");
         //requestUrl += requestUrlParam.toString();
-        //System.out.println(appid + appsecret + code + authurl);
         //System.out.println(requestUrl);
 
         HttpHeaders headers = new HttpHeaders();
@@ -54,9 +83,24 @@ public class LoginService {
         String result = restTemplate.postForObject(requestUrl, formEntity, String.class);
         System.out.println(result.toString());
 
-        return result;
+        return result;        */
+
+        /* GET */
+        RestTemplate restTemplate = new RestTemplate();
+        requestUrl += String.format("?appid=%s&secret=%s&js_code=%s&grant_type=%s", appid, appsecret, code, grant_type);
+        Debug.Log(requestUrl);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(requestUrl, String.class);
+        return responseEntity.getBody();
     }
 
+    public Boolean isValidData(JSONObject obj) {
+        String parsedAppid = obj.getJSONObject("watermark").getString("appid");
+        if (! parsedAppid.equals(appid)) {
+            Debug.Log("Bad session key interpration! Parsed appid is " + parsedAppid);
+            return false;
+        }
+        return true;
+    }
 
     /**
      * 解密用户敏感数据获取用户信息
@@ -67,14 +111,20 @@ public class LoginService {
      * @param iv 加密算法的初始向量
      * @return
      */  
-/*
-    public static JSONObject getUserInfo(String encryptedData,String sessionKey,String iv){
+
+    public JSONObject getEncryptedInfo(String sessionKey,String encryptedData,String iv){
         // 被加密的数据
-        byte[] dataByte = Base64.decode(encryptedData);
+        Base64.Decoder decoder = Base64.getDecoder();
+        byte[] dataByte = decoder.decode(encryptedData);
         // 加密秘钥
-        byte[] keyByte = Base64.decode(sessionKey);
+        byte[] keyByte = decoder.decode(sessionKey);
         // 偏移量
-        byte[] ivByte = Base64.decode(iv);
+        byte[] ivByte = decoder.decode(iv);
+
+        Debug.Log("dataByte: 0x" + Debug.byteArrayToString(dataByte));
+        Debug.Log("keyByte: 0x" + Debug.byteArrayToString(keyByte));
+        Debug.Log("ivByte: 0x" + Debug.byteArrayToString(ivByte));
+
         try {
                // 如果密钥不足16位，那么就补足.  这个if 中的内容很重要
             int base = 16;
@@ -89,34 +139,47 @@ public class LoginService {
             Security.addProvider(new BouncyCastleProvider());
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding","BC");
             SecretKeySpec spec = new SecretKeySpec(keyByte, "AES");
-            AlgorithmParameters parameters = AlgorithmParameters.getInstance("AES");
-            parameters.init(new IvParameterSpec(ivByte));
-            cipher.init(Cipher.DECRYPT_MODE, spec, parameters);// 初始化
+            //AlgorithmParameters parameters = AlgorithmParameters.getInstance("AES");
+            //parameters.init(new IvParameterSpec(ivByte));
+            cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(ivByte));// 初始化
             byte[] resultByte = cipher.doFinal(dataByte);
             if (null != resultByte && resultByte.length > 0) {
                 String result = new String(resultByte, "UTF-8");
-                return JSON.parseObject(result);
+                //Debug.Log(result);
+                JSONObject info = new JSONObject(result);
+                /* verification should be performed in client
+                String parsedAppid = info.getJSONObject("watermark").getString("appid");
+                if (! parsedAppid.equals(appid)) {
+                    Debug.Log("Bad session key interpration! Parsed appid is " + parsedAppid);
+                }
+                */
+                return info;
             }
-        } catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage(), e);
-        } catch (NoSuchPaddingException e) {
-            log.error(e.getMessage(), e);
-        } catch (InvalidParameterSpecException e) {
-            log.error(e.getMessage(), e);
-        } catch (IllegalBlockSizeException e) {
-            log.error(e.getMessage(), e);
-        } catch (BadPaddingException e) {
-            log.error(e.getMessage(), e);
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
-        } catch (InvalidKeyException e) {
-            log.error(e.getMessage(), e);
-        } catch (InvalidAlgorithmParameterException e) {
-            log.error(e.getMessage(), e);
-        } catch (NoSuchProviderException e) {
-            log.error(e.getMessage(), e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        /*
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        //} catch (InvalidParameterSpecException e) {
+        //    e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
+        */
         return null;
     }
-*/
+
 }
