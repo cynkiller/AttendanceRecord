@@ -19,6 +19,7 @@ import org.json.JSONException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import javax.crypto.BadPaddingException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class SessionController {
         String result = loginService.getWeixinOpenidAndSessionkey(code);
         String outString;
         ObjectMapper mapper = new ObjectMapper();
-       try {
+        try {
             SessionData.ServerData serverData = mapper.readValue(result, SessionData.ServerData.class);
             sessionData.setServerData(serverData);
             Debug.Log(serverData);
@@ -127,15 +128,21 @@ public class SessionController {
             String groupIv = data.getGroupIv();
             if (!Debug.emptyStringExists(groupData, groupIv)) {
                 Debug.Log("groupData: " + groupData + " groupIv: " + groupIv);
-                JSONObject groupInfo = loginService.getEncryptedInfo(ssk, groupData, groupIv);
-                Debug.Log(groupInfo.toString());
-                if (loginService.isValidData(groupInfo)) {
-                    if (groupInfo.has("openGId")) {
-                        sessionData.setOpenGId(groupInfo.getString("openGId"));
+                try {
+                    JSONObject groupInfo = loginService.getEncryptedInfo(ssk, groupData, groupIv);
+                    Debug.Log(groupInfo.toString());
+                    if (loginService.isValidData(groupInfo)) {
+                        if (groupInfo.has("openGId")) {
+                            sessionData.setOpenGId(groupInfo.getString("openGId"));
+                        }
                     }
+                    sessionService.addNewSession(serverData.getOpenid(), sessionData);
+                    Debug.Log("sessionData: " + sessionData.toString());
+                } catch(BadPaddingException e) {
+                    e.printStackTrace();
+                    outString = "Bad encrypted data.";
+                    return outString;
                 }
-                sessionService.addNewSession(serverData.getOpenid(), sessionData);
-                Debug.Log("sessionData: " + sessionData.toString());
             }
             return new JSONObject("{status: ok, openGId: " + sessionData.getOpenGId() + "}").toString();
         } catch (Exception e) {

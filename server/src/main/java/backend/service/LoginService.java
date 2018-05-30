@@ -112,7 +112,7 @@ public class LoginService {
      * @return
      */  
 
-    public JSONObject getEncryptedInfo(String sessionKey,String encryptedData,String iv){
+    public JSONObject getEncryptedInfo(String sessionKey,String encryptedData,String iv) throws BadPaddingException {
         // 被加密的数据
         Base64.Decoder decoder = Base64.getDecoder();
         byte[] dataByte = decoder.decode(encryptedData);
@@ -155,6 +155,9 @@ public class LoginService {
                 */
                 return info;
             }
+        } catch(BadPaddingException e) {
+            e.printStackTrace();
+            throw new BadPaddingException();
         } catch (Exception e) {
             e.printStackTrace();
         }
