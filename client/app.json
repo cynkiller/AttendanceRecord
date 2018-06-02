@@ -1,0 +1,45 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/logs/logs"
+  ],
+  "window":{
+    "backgroundTextStyle":"#FFF",
+    "navigationBarBackgroundColor": "#000",
+    "navigationBarTitleText": "First App",
+    "navigationBarTextStyle":"light",
+    "backgroundColor": "#eeeeee"
+  },
+  "tabBar": {
+    "backgroundColor": "#FFF",
+    "color": "#000",
+    "selectedColor": "#b4282d",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "resource/ic_menu_choice_nor.png",
+        "selectedIconPath": "resource/ic_menu_choice_pressed.png"
+      },
+      {
+        "pagePath": "pages/logs/logs",
+        "text": "日志",
+        "iconPath": "resource/ic_menu_topic_nor.png",
+        "selectedIconPath": "resource/ic_menu_topic_pressed.png"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 5000,
+    "connectSocket": 5000,
+    "downloadFile": 5000,
+    "uploadFile": 10000
+  },
+  "debug": true,
+  "plugins": {
+    "calendar": {
+      "version": "1.1.0",
+      "provider": "wx92c68dae5a8bb046"
+    }
+  }
+}

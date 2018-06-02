@@ -1,0 +1,35 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else>
+      <view class="profile-info">
+        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+      </view>
+      <!-- <view>{{ msg }}</view> -->
+      <view class="map">
+        <map longitude="{{ long }}" latitude="{{ lati }}" markers="{{markers}}"></map> <!-- shanghai (121.47, 31.23) -->
+      </view>
+        <button bindtap="clickMe" class="botton">选择排练地点</button>
+      <view>
+        <text class="address">{{ address }}</text>
+      </view>
+      <block wx:for="{{ jsonmsg }}" wx:for-item="person">
+            <view class="tr bg-g">
+              <view class="td">{{person.firstName}}</view>
+              <view class="td">{{person.lastName}}</view>
+            </view>
+      </block>
+      <calendar />
+      <button open-type="getUserInfo"></button>
+    </block>
+  </view>
+  <!--https://developers.weixin.qq.com/miniprogram/dev/component/open-data.html-->
+  <open-data type="groupName" open-gid="{{opengid}}">opengid</open-data>
+  <!--
+  <view class="usermotto">
+    <text class="user-motto">{{motto}}</text>
+  </view>
+  -->
+</view>
