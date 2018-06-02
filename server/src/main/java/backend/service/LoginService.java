@@ -8,17 +8,9 @@ import java.io.IOException;
 import java.util.Base64;
 import org.json.JSONObject;
 
-import java.net.URL;
-import java.net.URLConnection;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.HttpEntity;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.ResponseEntity;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;
@@ -37,6 +29,7 @@ import java.security.InvalidAlgorithmParameterException;
 import javax.crypto.BadPaddingException;
 
 import backend.util.Debug;
+import backend.util.Utility;
 
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -58,39 +51,12 @@ public class LoginService {
      */
     public String getWeixinOpenidAndSessionkey(String code) throws IOException {
         String requestUrl = authurl;
-        String grant_type = "authorization_code";
-        Debug.Log(  "appid: " + appid +
-                " appsecret: " + appsecret +
-                " js_code: " + code +
-                " authurl: " + authurl);
-
-        /* POST WAY
-        JSONObject requestUrlParam = new JSONObject();
-        requestUrlParam.put("appid", appid);
-        requestUrlParam.put("secret", appsecret);
-        requestUrlParam.put("js_code", code);
-        requestUrlParam.put("grant_type", "authorization_code");
-        //requestUrl += requestUrlParam.toString();
-        //System.out.println(requestUrl);
-
-        HttpHeaders headers = new HttpHeaders();
-        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
-        headers.setContentType(type);
-        headers.add("Accept", MediaType.APPLICATION_JSON.toString());
-        HttpEntity<String> formEntity = new HttpEntity<String>(requestUrlParam.toString(), headers);
-        //send request to wechat API for openid and session key
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.postForObject(requestUrl, formEntity, String.class);
-        System.out.println(result.toString());
-
-        return result;        */
-
-        /* GET */
-        RestTemplate restTemplate = new RestTemplate();
-        requestUrl += String.format("?appid=%s&secret=%s&js_code=%s&grant_type=%s", appid, appsecret, code, grant_type);
-        Debug.Log(requestUrl);
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(requestUrl, String.class);
-        return responseEntity.getBody();
+        JSONObject parms = new JSONObject();
+        parms.put("appid", appid);
+        parms.put("secret", appsecret);
+        parms.put("js_code", code);
+        parms.put("grant_type", "authorization_code");
+        return Utility.UrlRequest(requestUrl, parms);
     }
 
     public Boolean isValidData(JSONObject obj) {

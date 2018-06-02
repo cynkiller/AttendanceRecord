@@ -63,7 +63,7 @@ public class SessionService {
         return newsd;
     }
 
-    public String addNewSession(String openid, SessionData sd) {
+    public String getNewSession(String openid, SessionData sd) {
         Debug.Log("Current timestamp: " + Debug.getTimestamp());
         Debug.Log("Current time: " + Debug.getDatetime());
         Debug.Log("openid: " + openid);

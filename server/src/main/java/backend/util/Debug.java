@@ -3,6 +3,7 @@ package backend.util;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.lang.Thread;
 
 public class Debug {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss]");
@@ -35,11 +36,15 @@ public class Debug {
     }
 
     public static void Log(Object message) {
-        System.out.println(getDatetime() + " [INFO\t] " + message);
+        //String func = Thread.currentThread().getStackTrace()[1].getMethodName();
+        //System.out.println(getDatetime() + String.format(" [INFO\t] [%s] %s", func, message));
+        System.out.println(getDatetime() + String.format(" [INFO\t] %s", message));
     }
 
     public static void Log(Object message, String type) {
-        System.out.println(getDatetime() + " [" + type + "\t] " + message);
+        //String func = Thread.currentThread().getStackTrace()[1].getMethodName();
+        //System.out.println(getDatetime() + String.format(" [%s\t] [%s] %s", type, func, message));
+        System.out.println(getDatetime() + String.format(" [%s\t] %s", type, message));
     }
 
     public static void Log(String... args) {

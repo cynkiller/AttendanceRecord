@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import backend.repo.PersonRepository;
 import backend.model.Person;
 import java.util.List;
+import backend.util.Utility;
 
 @RestController
-@RequestMapping("/people")
 public class PersonController {
 	@Autowired
 	private PersonRepository repository;
 	
-	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/people", method = RequestMethod.GET, produces = "application/json")
 	public List<Person> queryPerson(@RequestParam(value="name", defaultValue="") String name) {
 		if (! name.isEmpty()) {
 			return repository.findByLastName(name);
@@ -23,4 +23,12 @@ public class PersonController {
 			return repository.findAll();
 		}
 	}
+
+	@RequestMapping("/test/distance")
+	public double queryPerson() {
+		double distance = Utility.latlongDistance(121.2000, 31.1000, 121.477968, 31.229016);
+		System.out.println(distance);
+		return distance;
+	}
+
 }

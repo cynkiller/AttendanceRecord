@@ -102,7 +102,7 @@ public class SessionController {
             if (userInfoService.openidExists(serverData.getOpenid())) {
                 Debug.Log("Openid exists in the database. Verification passed.");
                 // find existing 3rdsessionid
-
+                return sessionService.getNewSession(serverData.getOpenid(), sessionData);
             }
 
             /* Get user sensitive data and group info in case needed */
@@ -137,7 +137,7 @@ public class SessionController {
                         }
                     }
                     Debug.Log("sessionData: " + sessionData.toString());
-                    String thirdSessionKey = sessionService.addNewSession(serverData.getOpenid(), sessionData);
+                    String thirdSessionKey = sessionService.getNewSession(serverData.getOpenid(), sessionData);
                     outString = "{ status: ok, thirdSessionKey: " + thirdSessionKey + "}";
                     return new JSONObject(outString).toString();
                 } catch(BadPaddingException e) {
