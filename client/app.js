@@ -81,6 +81,7 @@ App({
                   // 3. not registered => verify page => enter verify key / ask user to open in certain group chat
                   wx.showToast({
                     title: 'Got openid',
+                    duration: 500
                   })
                 },
                 fail: function (res) {
@@ -113,7 +114,20 @@ App({
       iv: null,
       openGId: null
     },
-    defaultlongitude: 121.43247,
-    defaultlatitude: 31.19564
-  }
+    point: null
+  },
+  rehearsalInfo: {
+    rehearsalDate: {
+      year: 2018,
+      month: 6,
+      day: 4,
+      start: "0:30",
+      end: "1:30"
+    },
+    //rehearsalTime: "2018年6月2日 9:30 - 12:30",
+    rehearsalLocation: "地点名称 地址",
+    longitude: 121,
+    latitude: 31,
+    addressBook: []
+  },
 })

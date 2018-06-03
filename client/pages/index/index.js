@@ -1,4 +1,5 @@
 //index.js
+
 //获取应用实例
 const app = getApp()
 
@@ -13,6 +14,7 @@ Page({
     userInfo: {},
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    administrator: true,
     markers: [
       {
         id: 0,
@@ -23,6 +25,13 @@ Page({
         height: 30,
       }, // destination
       {}  // current location    
+    ],
+    includePoints: [
+      {
+        longitude: app.globalData.defaultlongitude,
+        latitude: app.globalData.defaultlatitude,
+      },
+      {}
     ]
   },
   //事件处理函数
@@ -63,7 +72,8 @@ Page({
       withShareTicket: true //要求小程序返回分享目标信息
     })
     this.setData({
-      opengid: app.globalData.groupInfo.openGId
+      opengid: app.globalData.groupInfo.openGId,
+      point: 30
     })
   },
   getUserInfo: function(e) {
@@ -76,77 +86,17 @@ Page({
   },
   onShareAppMessage: function () {
     return {
-      title: "First App",
+      title: "打卡神器",
       path: "/pages/index/index",
       success(res) {
         console.log(res)
       }
     }
   },
-  clickMe: function () {
-    //this.setData({ msg: "Hello World" })
-    /*
-    this.setData({
-      long: app.globalData.defaultlongitude,
-      lati: app.globalData.defaultlatitude
-    })
-    */
-    util.getCurrentPosition(this);
-    var that = this;
-    wx.chooseLocation({
-      success: function (res) {
-        // success
-        console.log(res, "location")
-        console.log(res.name)
-        console.log(res.latitude)
-        console.log(res.longitude)
-        //app.globalData.defaultlongitude = res.longitude;
-        //app.globalData.defaultlatitude = res.latitude;
-        that.data.markers[0].longitude = res.longitude;
-        that.data.markers[0].latitude = res.latitude;
-        that.setData({
-          long: res.longitude,
-          lati: res.latitude,
-          address: res.name + ' ' + res.address,
-          markers: that.data.markers,
-        })
-        wx.showToast({
-          title: '更新成功',
-        })
-      },
-      fail: function () {
-        // fail
-      },
-      complete: function () {
-        // complete
-      }
-    })
-    console.log(app.globalData.userInfo.nickName)
-    console.log(app.globalData.userInfo.avatarUrl)
-
-    /* Test https request */
-    wx.request({
-      url: '{yourhostname}/api/people',
-      header: {
-        'content-type': 'application/json',
-        'Accept': 'application/json'
-      },
-      method: "GET",
-      success: function (res) {
-        //console.log(res.data._links.people.href)
-        console.log(res.data)
-        that.setData({
-          //jsonmsg: res.data._links.people.href
-          jsonmsg: res.data
-        })
-      },
-      fail: function (res) {
-        console.log("request failed.")
-        console.log(res)
-      },
-      complete: function() {
-        console.log("request complete.")
-      }
+  navigate: function(event) {
+    var target = event.currentTarget.dataset.target;
+    wx.navigateTo({
+      url: '../' + target + '/' + target,
     })
   }
 })

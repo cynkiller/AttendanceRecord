@@ -1,0 +1,44 @@
+<!--pages/setting/setting.wxml-->
+<view class="page">
+    <view class="page__hd">
+        <view class="page__title">当前排练信息</view>
+        <view class="page__desc">排练时间：{{rehearsalDate.year}}年{{rehearsalDate.month}}月{{rehearsalDate.day}}日 {{rehearsalDate.start}} - {{rehearsalDate.end}} </view>
+        <view class="page__desc">排练地点：{{rehearsalLocation}}</view>
+    </view>
+
+    <view class="weui-cells__title"></view>
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_access" bindtap="settingAddress" data-status="{{settingAddress}}">
+            <view class="weui-cell__bd">
+                <view style="display: inline-block; vertical-align: middle">设置排练地址</view>
+            </view>
+            <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+        </view>
+        <view style="padding-left: 10px" wx:if="{{settingAddress}}">
+          <view class="weui-cells weui-cells_after-title">
+              <radio-group bindchange="updateAddress">
+                  <label class="weui-cell weui-check__label" wx:for="{{addressBook}}" wx:key="value">
+                      <radio class="weui-check" value="{{item.address}}" checked="{{item.checked}}"/>
+
+                      <view class="weui-cell__bd">{{item.name}}</view>
+                      <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{item.checked}}">
+                          <icon class="weui-icon-radio" type="success_no_circle" size="16"></icon>
+                      </view>
+                  </label>
+              </radio-group>
+              <view class="weui-cell weui-cell_link">
+                  <view class="weui-cell__bd" bindtap="selectLocation">添加更多</view>
+              </view>
+          </view>
+        </view>
+        <!--<view class="weui-cells__title">{{address}}</view>-->
+
+        <view class="weui-cell weui-cell_access" bindtap="settingDate">
+            <view class="weui-cell__bd">
+                <view style="display: inline-block; vertical-align: middle">设置排练时间</view>
+            </view>
+            <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+        </view>
+    </view>
+
+</view>

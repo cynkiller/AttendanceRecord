@@ -1,13 +1,15 @@
 {
-  "pages":[
+  "pages": [
+    "pages/home/home",
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/logs/logs",
+    "pages/setting/setting"
   ],
-  "window":{
-    "backgroundTextStyle":"#FFF",
+  "window": {
+    "backgroundTextStyle": "#FFF",
     "navigationBarBackgroundColor": "#000",
-    "navigationBarTitleText": "First App",
-    "navigationBarTextStyle":"light",
+    "navigationBarTitleText": "打卡神器",
+    "navigationBarTextStyle": "light",
     "backgroundColor": "#eeeeee"
   },
   "tabBar": {
@@ -16,16 +18,16 @@
     "selectedColor": "#b4282d",
     "list": [
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/home/home",
         "text": "首页",
-        "iconPath": "resource/ic_menu_choice_nor.png",
-        "selectedIconPath": "resource/ic_menu_choice_pressed.png"
-      },
-      {
-        "pagePath": "pages/logs/logs",
-        "text": "日志",
         "iconPath": "resource/ic_menu_topic_nor.png",
         "selectedIconPath": "resource/ic_menu_topic_pressed.png"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "我",
+        "iconPath": "resource/ic_menu_choice_nor.png",
+        "selectedIconPath": "resource/ic_menu_choice_pressed.png"
       }
     ]
   },

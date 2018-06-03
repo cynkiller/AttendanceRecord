@@ -1,4 +1,6 @@
 /**index.wxss**/
+
+/*
 .userinfo {
   display: flex;
   flex-direction: column;
@@ -89,4 +91,12 @@
   display: flex;
   height: 3rem;
   align-items: center;
+}
+*/
+
+.signin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

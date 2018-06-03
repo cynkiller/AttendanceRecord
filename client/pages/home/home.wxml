@@ -1,25 +1,57 @@
 <!--pages/home/home.wxml-->
 <view class="page">
     <view class="page__hd">
-        <view class="page__title">WeUI</view>
-        <view class="page__desc">WeUI 是一套同微信原生视觉体验一致的基础样式库，由微信官方设计团队为微信内网页和微信小程序量身设计，令用户的使用感知更加统一。</view>
-    </view>
-
-    <view class="page__bd page__bd_spacing">
-        <view class="button-sp-area">
-            <button class="weui-btn" type="primary" plain="true">打卡</button>
-            <button class="weui-btn" type="primary" disabled="true" plain="true">按钮</button>
-<!--
-            <button class="weui-btn" type="default" plain="true">按钮</button>
-            <button class="weui-btn" type="default" disabled="true" plain="true">按钮</button>
-
-            <button class="weui-btn mini-btn" type="primary" size="mini">按钮</button>
-            <button class="weui-btn mini-btn" type="default" size="mini">按钮</button>
-            <button class="weui-btn mini-btn" type="warn" size="mini">按钮</button>
--->
+        <view class="page__title">排练信息</view>
+        <view class="page__desc">排练时间：{{rehearsalDate.year}}年{{rehearsalDate.month}}月{{rehearsalDate.day}}日 {{rehearsalDate.start}} - {{rehearsalDate.end}} </view>
+        <view class="page__desc">排练地点：{{rehearsalLocation}}</view>
+        
+        <view class="map">
+          <map markers="{{markers}}" include-points="{{includePoints}}"></map> <!-- shanghai (121.47, 31.23) -->
         </view>
     </view>
+    <view class="line"></view>
+
+    <view wx:if="{{signined}}">
+
+      <view class="map">
+      <view class="icon-box">
+            <icon type="success" size="93"></icon>
+            <view class="icon-box__ctn">
+                <view class="icon-box__title">打卡成功</view>
+                <!--<view class="icon-box__desc">用于表示操作顺利达成</view>-->
+            </view>
+        </view>
+        </view>
+    </view>
+    <view wx:else>
+      <view class="weui-cells__title">距离排练地点还有 {{distance}} 米</view>
+      <view class="weui-cells__title" wx:if="{{rehearsalStarted}}">已开始排练 {{remainHours}} 小时</view>
+      <view class="weui-cells__title" wx:else>距离下次排练还有 {{remainHours}} 小时</view>
+
+      <view class="page__bd page__bd_spacing">
+          <view class="button-sp-area">
+              <button class="weui-btn" type="primary" disabled="{{disableSignin}}" plain="true" bindtap="signin" wx:if="{{signined}}">已打卡</button>
+              <button class="weui-btn" type="primary" disabled="{{disableSignin}}" plain="true" bindtap="signin" wx:else>打卡</button>
+  <!--
+              <button class="weui-btn" type="default" plain="true">按钮</button>
+              <button class="weui-btn" type="default" disabled="true" plain="true">按钮</button>
+
+              <button class="weui-btn mini-btn" type="primary" size="mini">按钮</button>
+              <button class="weui-btn mini-btn" type="default" size="mini">按钮</button>
+              <button class="weui-btn mini-btn" type="warn" size="mini">按钮</button>
+  -->
+          </view>
+      </view>
+    </view>
+<!--
     <view class="page__ft">
         <image src="/resource/weui/icon_footer.png" style="width: 84px; height: 19px;"></image>
+    </view>
+-->
+    <view class="weui-footer">
+        <view class="weui-footer__links">
+            <navigator url="" class="weui-footer__link">Avalon Singers</navigator>
+        </view>
+        <view class="weui-footer__text">Copyright © 2018- </view>
     </view>
 </view>

@@ -1,35 +1,96 @@
 <!--index.wxml-->
-<view class="container">
-  <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+<view class="page">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class="signin"> 点击登录 </button>
     <block wx:else>
-      <view class="profile-info">
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </view>
-      <!-- <view>{{ msg }}</view> -->
-      <view class="map">
-        <map longitude="{{ long }}" latitude="{{ lati }}" markers="{{markers}}"></map> <!-- shanghai (121.47, 31.23) -->
-      </view>
-        <button bindtap="clickMe" class="botton">选择排练地点</button>
-      <view>
-        <text class="address">{{ address }}</text>
-      </view>
-      <block wx:for="{{ jsonmsg }}" wx:for-item="person">
-            <view class="tr bg-g">
-              <view class="td">{{person.firstName}}</view>
-              <view class="td">{{person.lastName}}</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell">
+                <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                    <block wx:if="{{userInfo.avatarUrl}}">
+                      <image src="{{userInfo.avatarUrl}}" style="width: 50px; height: 50px; display: block"/>
+                    </block>
+                    <block wx:else>
+                      <image src="/resource/weui/pic_160.png" style="width: 50px; height: 50px; display: block"/>
+                    </block>
+                    <!-- 右上角提醒
+                    <view class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</view> -->
+                </view>
+                <view class="weui-cell__bd">
+                    <block wx:if="{{userInfo.nickName}}">
+                      <view>{{userInfo.nickName}}</view>
+                    </block>
+                    <block wx:else>
+                      <view>昵称</view>
+                    </block>
+                    <view style="font-size: 13px;color: #888888;">
+                      <text style="float:left">积分：{{point}}</text>
+                      <image src="/resource/star.png" style="width: 15px; height: 15px; display: block; float: left; padding-left: 5px" />
+                    </view>
+                </view>
             </view>
-      </block>
-      <calendar />
-      <button open-type="getUserInfo"></button>
+        </view>
+
+        <view class="weui-cells__title"></view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_access">
+                <view class="weui-cell__bd">
+                    <view style="display: inline-block; vertical-align: middle">修改个人信息</view>
+                    <!-- 右边提醒
+                    <view class="weui-badge" style="margin-left: 5px;">8</view> -->
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            </view>
+            <view class="weui-cell weui-cell_access">
+                <view class="weui-cell__bd">
+                    <view style="display: inline-block; vertical-align: middle">上传作业</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            </view>
+            <view class="weui-cell weui-cell_access">
+                <view class="weui-cell__bd">
+                    <view style="display: inline-block; vertical-align: middle">积分详情</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            </view>
+            <view class="weui-cell weui-cell_access" wx:if="{{administrator}}">
+                <!--<view class="weui-cell__bd" bindtap="selectLocation">-->
+                <view class="weui-cell__bd" bindtap="navigate" data-target="setting">
+                    <view style="display: inline-block; vertical-align: middle">设置排练信息</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            </view>
+            <view class="weui-cell weui-cell_access" wx:if="{{administrator}}">
+                <view class="weui-cell__bd">
+                    <view style="display: inline-block; vertical-align: middle">排练概况</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            </view>
+            <view class="weui-cell weui-cell_access" wx:if="{{administrator}}">
+                <view class="weui-cell__bd">
+                    <view style="display: inline-block; vertical-align: middle">帮忙打卡</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            </view>
+            <view class="weui-cells__title">{{address}}</view>
+            <view class="weui-cell weui-cell_access">
+                <view class="weui-cell__bd" bindtap="navigate" data-target="logs">
+                    <view style="display: inline-block; vertical-align: middle">登录日志</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+            </view>
+        </view>
+          
+        <view class="userinfo">
+          <!--
+          <block wx:for="{{ jsonmsg }}" wx:for-item="person">
+                <view class="tr bg-g">
+                  <view class="td">{{person.firstName}}</view>
+                  <view class="td">{{person.lastName}}</view>
+                </view>
+          </block>
+          <calendar />
+          -->
+          <!--https://developers.weixin.qq.com/miniprogram/dev/component/open-data.html-->
+          <!-- <open-data type="groupName" open-gid="{{opengid}}">opengid</open-data> -->
+        </view>
     </block>
-  </view>
-  <!--https://developers.weixin.qq.com/miniprogram/dev/component/open-data.html-->
-  <open-data type="groupName" open-gid="{{opengid}}">opengid</open-data>
-  <!--
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
-  </view>
-  -->
 </view>

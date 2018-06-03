@@ -24,22 +24,46 @@ const getCurrentPosition = obj => {
       console.log("Current location")
       console.log("latitude", res.latitude)
       console.log("longitude", res.longitude)
+      console.log(obj.data.markers, obj.data.includePoints)
       obj.data.markers[1].longitude = res.longitude;
       obj.data.markers[1].latitude = res.latitude;
-      obj.data.markers[1].iconPath = "/resource/friendzone.png";
+      obj.data.markers[1].iconPath = "/resource/meilin.jpg";//"/resource/friendzone.png";
       obj.data.markers[1].width = 30;
       obj.data.markers[1].height = 30;
+      obj.data.markers[1].title = "当前地点";
+      obj.data.includePoints[1].longitude = res.longitude;
+      obj.data.includePoints[1].latitude = res.latitude;
       obj.setData({
         long: res.longitude,
         lati: res.latitude,
         markers: obj.data.markers,
+        includePoints: obj.data.includePoints
+      })
+      var includePoints = obj.data.includePoints;
+      var dist = getGpsDisance(includePoints[0].latitude, includePoints[0].longitude, includePoints[1].latitude, includePoints[1].longitude)
+      obj.setData({
+        distance: (dist).toFixed(0)
       })
       wx.showToast({
-        title: '地理位置更新完毕'
+        title: '地理位置更新完毕',
+        duration: 500
       })
       wx.hideLoading()
     }
   })  
+}
+
+function toRad(d) { return d * Math.PI / 180; }
+
+function getGpsDisance(lat1, lng1, lat2, lng2) {
+  console.log(lat1, lng1, lat2, lng2)
+  var dis = 0;
+  var radLat1 = toRad(lat1);
+  var radLat2 = toRad(lat2);
+  var deltaLat = radLat1 - radLat2;
+  var deltaLng = toRad(lng1) - toRad(lng2);
+  var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)));
+  return dis * 6378137;
 }
 
 /* ref: https://blog.csdn.net/xiejm2333/article/details/73297004
@@ -63,5 +87,6 @@ private static double rad(double d) {
 
 module.exports = {
   formatTime: formatTime,
-  getCurrentPosition: getCurrentPosition
+  getCurrentPosition: getCurrentPosition,
+  getGpsDisance: getGpsDisance
 }
