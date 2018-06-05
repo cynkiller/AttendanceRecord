@@ -23,8 +23,8 @@ Page({
       {
         id: 0,
         iconPath: "/resource/position.png",
-        longitude: app.rehearsalInfo.longitude,
-        latitude: app.rehearsalInfo.latitude,
+        longitude: null,
+        latitude: null,
         width: 30,
         height: 30,
       }, // destination
@@ -32,8 +32,8 @@ Page({
     ],
     includePoints: [
       {
-        longitude: app.rehearsalInfo.longitude,
-        latitude: app.rehearsalInfo.latitude,
+        longitude: null,
+        latitude: null,
       },
       {}
     ],
@@ -101,6 +101,7 @@ Page({
     this.data.includePoints[0].latitude = app.rehearsalInfo.latitude;
     this.setData({
       rehearsalDate: app.rehearsalInfo.rehearsalDate,
+      readableDate: util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
       rehearsalLocation: app.rehearsalInfo.rehearsalLocation,
       markers: this.data.markers,
       includePoints: this.data.includePoints

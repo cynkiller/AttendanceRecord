@@ -118,11 +118,9 @@ App({
   },
   rehearsalInfo: {
     rehearsalDate: {
-      year: 2018,
-      month: 6,
-      day: 4,
-      start: "0:30",
-      end: "1:30"
+      date: "2018-06-04",
+      startTime: "00:30",
+      endTime: "23:59"
     },
     //rehearsalTime: "2018年6月2日 9:30 - 12:30",
     rehearsalLocation: "地点名称 地址",

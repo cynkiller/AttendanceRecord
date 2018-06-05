@@ -1,1 +1,46 @@
 /* pages/setting/setting.wxss */
+.verticalLine {
+  padding: 12px 6px 0px 6px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border-left: 1px solid #888;
+  font-size: 0;
+}
+.short-label{width:55px;word-wrap:break-word;word-break:break-all}
+.cell-date {
+  width: 40%;
+  font-size: 15px;
+}
+.cell-start {
+  width: 20%;
+  font-size: 15px;
+}
+.cell-end {
+  width:20%;
+  font-size: 15px;
+}
+.datelabel {
+  color: #888;
+}
+.gray { 
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -ms-filter: grayscale(100%);
+    -o-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+
+.add-badge{
+  display:inline-block;
+  right:10px;
+  top:10px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background-color:#228B22;
+  color:#fff;
+  text-align:center;
+  font-size:10px;
+  vertical-align:middle;
+}
+.add-badge_dot{padding:.4em;min-width:0}

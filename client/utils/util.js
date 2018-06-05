@@ -14,6 +14,12 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+const toReadableDate = date => {
+  var ymd = date.split("-");
+  var date = ymd[0] + '年' + parseInt(ymd[1]) + '月' + parseInt(ymd[2]) + '日';
+  return date;
+}
+
 const getCurrentPosition = obj => {
   wx.showLoading({
     title: '获取当前地理位置...'
@@ -88,5 +94,6 @@ private static double rad(double d) {
 module.exports = {
   formatTime: formatTime,
   getCurrentPosition: getCurrentPosition,
-  getGpsDisance: getGpsDisance
+  getGpsDisance: getGpsDisance,
+  toReadableDate: toReadableDate
 }

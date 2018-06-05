@@ -2,7 +2,7 @@
 <view class="page">
     <view class="page__hd">
         <view class="page__title">排练信息</view>
-        <view class="page__desc">排练时间：{{rehearsalDate.year}}年{{rehearsalDate.month}}月{{rehearsalDate.day}}日 {{rehearsalDate.start}} - {{rehearsalDate.end}} </view>
+        <view class="page__desc">排练时间：{{readableDate}} {{rehearsalDate.startTime}} - {{rehearsalDate.endTime}} </view>
         <view class="page__desc">排练地点：{{rehearsalLocation}}</view>
         
         <view class="map">
@@ -50,7 +50,7 @@
 -->
     <view class="weui-footer">
         <view class="weui-footer__links">
-            <navigator url="" class="weui-footer__link">Avalon Singers</navigator>
+            <navigator url="/pages/password/password" class="weui-footer__link">Avalon Singers</navigator>
         </view>
         <view class="weui-footer__text">Copyright © 2018- </view>
     </view>

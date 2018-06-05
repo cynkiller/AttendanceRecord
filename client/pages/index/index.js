@@ -67,7 +67,7 @@ Page({
         }
       })
     }
-    util.getCurrentPosition(this)
+    //util.getCurrentPosition(this)
     wx.showShareMenu({
       withShareTicket: true //要求小程序返回分享目标信息
     })
@@ -98,5 +98,26 @@ Page({
     wx.navigateTo({
       url: '../' + target + '/' + target,
     })
+  },
+  askleave: function() {
+    wx.showModal({
+      title: '确认请假？',
+      content: "下次排练时间是: " + util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
+      confirmText: "确认",
+      cancelText: "再想想",
+      success: function (res) {
+        console.log(res);
+        if (res.confirm) {
+          console.log('用户点击主操作')
+          // TBD: update database
+          // TBD: check result
+          wx.showToast({
+            title: '请假成功',
+          })
+        } else {
+          console.log('用户点击辅助操作')
+        }
+      }
+    });
   }
 })

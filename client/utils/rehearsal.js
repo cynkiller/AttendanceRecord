@@ -3,16 +3,17 @@ function timestamps(obj) {
   var rehearsalDate = obj.data.rehearsalDate;
   var date = new Date();
   // Note month need to minus 1, Jun => 5
-  date.setFullYear(rehearsalDate.year, rehearsalDate.month - 1, rehearsalDate.day);
+  var ymd = rehearsalDate.date.split('-');
+  date.setFullYear(ymd[0], ymd[1] - 1, ymd[2]);
 
   // start time
-  var time = rehearsalDate.start.split(":");
+  var time = rehearsalDate.startTime.split(":");
   date.setHours(parseInt(time[0]), parseInt(time[1]));
   var startTimestamp = date.getTime();
   console.log("Start Date", date, "Start timestamp: ", startTimestamp)
 
   // end time
-  time = rehearsalDate.end.split(":");
+  time = rehearsalDate.endTime.split(":");
   date.setHours(parseInt(time[0]), parseInt(time[1]));
   var endTimestamp = date.getTime();
   console.log("End Date", date, "End timestamp: ", endTimestamp)

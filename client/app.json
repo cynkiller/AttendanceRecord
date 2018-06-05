@@ -3,7 +3,9 @@
     "pages/home/home",
     "pages/index/index",
     "pages/logs/logs",
-    "pages/setting/setting"
+    "pages/setting/setting",
+    "pages/detail/detail",
+    "pages/password/password"
   ],
   "window": {
     "backgroundTextStyle": "#FFF",

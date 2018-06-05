@@ -40,6 +40,12 @@
                 <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
             </view>
             <view class="weui-cell weui-cell_access">
+                <view class="weui-cell__bd" bindtap='askleave'>
+                    <view style="display: inline-block; vertical-align: middle">我要请假</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+            </view>
+            <view class="weui-cell weui-cell_access">
                 <view class="weui-cell__bd">
                     <view style="display: inline-block; vertical-align: middle">上传作业</view>
                 </view>
@@ -56,7 +62,7 @@
                 <view class="weui-cell__bd" bindtap="navigate" data-target="setting">
                     <view style="display: inline-block; vertical-align: middle">设置排练信息</view>
                 </view>
-                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
             </view>
             <view class="weui-cell weui-cell_access" wx:if="{{administrator}}">
                 <view class="weui-cell__bd">
