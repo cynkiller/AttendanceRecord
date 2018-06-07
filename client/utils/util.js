@@ -50,10 +50,12 @@ const getCurrentPosition = obj => {
       obj.setData({
         distance: (dist).toFixed(0)
       })
+      /*
       wx.showToast({
         title: '地理位置更新完毕',
         duration: 500
       })
+      */
       wx.hideLoading()
     }
   })  
@@ -91,9 +93,43 @@ private static double rad(double d) {
 }
 */
 
+const sleep = d => {
+  for (var t = Date.now(); Date.now() - t <= d;);
+}
+
+const onloadCheck = (app, obj) => {
+  if (app.globalData.userInfo) {
+    obj.setData({
+      userInfo: app.globalData.userInfo,
+      hasUserInfo: true
+    })
+  } else if (obj.data.canIUse) {
+    // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+    // 所以此处加入 callback 以防止这种情况
+    app.userInfoReadyCallback = res => {
+      obj.setData({
+        userInfo: res.userInfo,
+        hasUserInfo: true
+      })
+    }
+  } else {
+    // 在没有 open-type=getUserInfo 版本的兼容处理
+    wx.getUserInfo({
+      success: res => {
+        app.globalData.userInfo = res.userInfo
+        obj.setData({
+          userInfo: res.userInfo,
+          hasUserInfo: true
+        })
+      }
+    })
+  }
+}
 module.exports = {
   formatTime: formatTime,
   getCurrentPosition: getCurrentPosition,
   getGpsDisance: getGpsDisance,
-  toReadableDate: toReadableDate
+  toReadableDate: toReadableDate,
+  sleep: sleep,
+  onloadCheck: onloadCheck
 }

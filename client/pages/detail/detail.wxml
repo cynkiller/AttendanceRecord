@@ -1,2 +1,43 @@
 <!--pages/detail/detail.wxml-->
-<text>pages/detail/detail.wxml</text>
+
+<view class="page">
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell">
+            <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                <block wx:if="{{userInfo.avatarUrl}}">
+                  <image src="{{userInfo.avatarUrl}}" style="width: 50px; height: 50px; display: block"/>
+                </block>
+                <block wx:else>
+                  <image src="/resource/weui/pic_160.png" style="width: 50px; height: 50px; display: block"/>
+                </block>
+                <!-- 右上角提醒
+                <view class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</view> -->
+            </view>
+            <view class="weui-cell__bd">
+                <block wx:if="{{userInfo.nickName}}">
+                  <view>{{userInfo.nickName}}</view>
+                </block>
+                <block wx:else>
+                  <view>昵称</view>
+                </block>
+                <view style="font-size: 13px;color: #888888;">
+                  <text style="float:left">积分：{{point}}</text>
+                  <image src="/resource/star.png" style="width: 15px; height: 15px; display: block; float: left; padding-left: 5px" />
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <view class="weui-cells__title">排练记录</view>
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell" style="font-size:14px; color: #888;" wx:if="{{index < maxIdx}}" wx:for="{{rehearsalRecord}}" wx:for-item="info">
+            <view class="weui-cell__bd" style="padding-left: 10px;"> {{info.date}} </view>
+            <view class="weui-cell__bd" style="padding-left: 10px;"> {{info.status}} </view>
+            <view class="weui-cell__bd" style="padding-left: 10px;"> 剩余积分： {{info.remainPoint}} </view>
+        </view>
+        <view class="weui-cell weui-cell_link">
+            <view class="weui-cell__bd" style="padding-left: 10px;" bindtap="loadMore"> 显示更多记录 </view>
+            <view class="weui-cell__hd" style="padding-left: 10px;" bindtap="fold"> 收起 </view>
+        </view>
+    </view>
+</view>

@@ -108,8 +108,14 @@ Page({
     })
     console.log(this.data.markers);
     util.getCurrentPosition(this);
+    var distance = util.getGpsDisance(
+          this.data.includePoints[0].latitude,
+          this.data.includePoints[0].longitude,
+          this.data.includePoints[1].latitude,
+          this.data.includePoints[1].longitude);
+    console.log("distance:", distance)
     var remain = rehearsal.getRemainTime(this);
-    if (rehearsal.isValidSigninTime(this) && this.data.signined == false) {
+    if (rehearsal.isValidSigninTime(this) && this.data.signined == false && distance <= 10) {
       remain = (remain / 1000 / 60 / 60).toFixed(2);
       this.setData({
         disableSignin: false,
@@ -122,6 +128,17 @@ Page({
         disableSignin: true,
         remainHours: remain
       })
+      if (!rehearsal.isValidSigninTime(this)) {
+        wx.showToast({
+          title: '不在打卡时间内',
+          duration: 2000
+        })
+      } else if (distance > 10) {
+        wx.showToast({
+          title: '不在打卡距离内',
+          duration: 2000
+        })
+      }
     }
   },
 

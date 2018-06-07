@@ -69,11 +69,37 @@
           </view>
         </view>
 
+        <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="modifyPoint" data-status="{{settingStatus.modifyPoint}}">
+            <view class="weui-cell__bd">
+                <view style="display: inline-block; vertical-align: middle">修改成员积分</view>
+            </view>
+            <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+        </view>
+
+        <view wx:if="{{settingStatus.modifyPoint}}">
+          <view class="weui-cell" style="padding-left: 10px">
+            <view class="weui-cell" style="color: #888; font-size: 14px;">修改积分</view>
+          </view>
+        </view>
+
+        <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="modifyPassword" data-status="{{settingStatus.modifyPassword}}">
+            <view class="weui-cell__bd">
+                <view style="display: inline-block; vertical-align: middle">修改口令</view>
+            </view>
+            <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+        </view>
+
+        <view wx:if="{{settingStatus.modifyPassword}}">
+          <view class="weui-cell" style="padding-left: 10px">
+            <view class="weui-cell" style="color: #888; font-size: 14px;">新口令</view>
+          </view>
+        </view>
+
         <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="managingAdministrator" data-status="{{settingStatus.managingAdministrator}}">
             <view class="weui-cell__bd">
                 <view style="display: inline-block; vertical-align: middle">管理员管理</view>
             </view>
-            <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            <view class="weui-cell__ft weui-cell__ft_in-access"></view>
         </view>
 
         <view wx:if="{{settingStatus.managingAdministrator}}">

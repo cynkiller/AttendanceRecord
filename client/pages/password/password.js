@@ -5,7 +5,9 @@ Page({
    * 页面的初始数据
    */
   data: {
-    badpassword: false
+    badpassword: false,
+    // mock data
+    goodPassword: '****'
   },
 
   /**
@@ -60,7 +62,34 @@ Page({
   /**
    * 用户点击右上角分享
    */
+  /*
   onShareAppMessage: function () {
   
+  }
+  */
+  formSubmit: function( event ) {
+    console.log(event.detail.value.passwd)
+    if (this.data.goodPassword == event.detail.value.passwd) {
+      wx.showToast({
+        title: "梅林你可来了",
+      })
+
+      setTimeout(function () {
+        wx.switchTab({
+          url: '/pages/home/home',
+        });
+      }, 3000)
+
+    } else {
+      this.setData({
+        badpassword: true
+      })
+      var that = this;
+      setTimeout(function () {
+        that.setData({
+          badpassword: false
+        });
+      }, 1000);
+    }
   }
 })

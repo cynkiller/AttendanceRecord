@@ -15,7 +15,8 @@ Page({
     settingStatus: {
       settingAddress: false,
       settingDate: false,
-      managingAdministrator: false
+      managingAdministrator: false,
+      modifyPoint: false
     },
 
     // mock data
@@ -302,6 +303,12 @@ Page({
     // 接口： 新增管理员id名单，移除管理员id名单
     wx.showToast({
       title: '变更成功！',
+    })
+    util.sleep(2000);
+    var setting = this.data.settingStatus;
+    setting['managingAdministrator'] = false;
+    this.setData({
+      settingStatus: setting
     })
   }
 })

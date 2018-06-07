@@ -51,7 +51,7 @@
                 </view>
                 <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
             </view>
-            <view class="weui-cell weui-cell_access">
+            <view class="weui-cell weui-cell_access" bindtap="navigate" data-target="detail">
                 <view class="weui-cell__bd">
                     <view style="display: inline-block; vertical-align: middle">积分详情</view>
                 </view>
@@ -70,13 +70,6 @@
                 </view>
                 <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
             </view>
-            <view class="weui-cell weui-cell_access" wx:if="{{administrator}}">
-                <view class="weui-cell__bd">
-                    <view style="display: inline-block; vertical-align: middle">帮忙打卡</view>
-                </view>
-                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
-            </view>
-            <view class="weui-cells__title">{{address}}</view>
             <view class="weui-cell weui-cell_access">
                 <view class="weui-cell__bd" bindtap="navigate" data-target="logs">
                     <view style="display: inline-block; vertical-align: middle">登录日志</view>
