@@ -34,16 +34,10 @@ public class SessionService {
         return false;
     }
 
-    public boolean sessionExist(String openid) {
-        if (session.get(openid) != null)
-            return true;
-        return false;
-    }
-
     /**
      * Assumption: openid not registered
      */
-    public SessionData getThirdSession(String openid, SessionData sd) {
+    private SessionData getThirdSession(String openid, SessionData sd) {
         // Assumption: openid not registered
         assert sessionExist(openid) == false;
 
@@ -61,6 +55,12 @@ public class SessionService {
         long expire = sd.getServerData().getExpires_in();
         newsd.setExpiretime(Debug.getTimestamp() + expire * 1000); // milisecond need to multiply with 1000
         return newsd;
+    }
+
+    public boolean sessionExist(String openid) {
+        if (session.get(openid) != null)
+            return true;
+        return false;
     }
 
     public String getNewSession(String openid, SessionData sd) {

@@ -44,3 +44,16 @@
   vertical-align:middle;
 }
 .add-badge_dot{padding:.4em;min-width:0}
+
+.right-gray {
+  color: #888;
+  font-size: 14px;
+  border-right:1rpx solid #d9d9d9;
+  height:2.58823529em;
+  min-height:2.58823529em;
+  line-height:2.58823529em;
+}
+
+.wx-switch-input{width:38px !important;height:20px !important;}
+.wx-switch-input::before{width:38px !important;height: 20px !important;}
+.wx-switch-input::after{width: 20px !important;height: 20px !important;}

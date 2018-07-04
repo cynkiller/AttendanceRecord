@@ -45,7 +45,8 @@ Page({
         avatarurl: '/resource/weui/pic_160.png',
         checked: false
       }
-    ]
+    ],
+    strategies: []
   },
 
   /**
@@ -53,11 +54,18 @@ Page({
    */
   onLoad: function (options) {
     console.log(this.data.addressBook);
+    // fake data
+    var strtgs = []
+    for (var i = 0; i < 60; i++) {
+      strtgs.push(i - 30)
+    }
     this.setData({
       rehearsalDate: app.rehearsalInfo.rehearsalDate,
       readableDate: util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
       rehearsalLocation: app.rehearsalInfo.rehearsalLocation,
-      addressBook: app.rehearsalInfo.addressBook
+      addressBook: app.rehearsalInfo.addressBook,
+      strategies: strtgs,
+      strategyIndex: 30
     })
   },
 
@@ -159,33 +167,6 @@ Page({
     console.log(app.globalData.userInfo.nickName)
     console.log(app.globalData.userInfo.avatarUrl)
     console.log("global addressBook", app.rehearsalInfo.addressBook)
-
-/*
-    // Test https request
-    wx.request({
-      url: 'http://ec2-54-244-201-130.us-west-2.compute.amazonaws.com/api/people',
-      header: {
-        'content-type': 'application/json',
-        'Accept': 'application/json'
-      },
-      method: "GET",
-      success: function (res) {
-        //console.log(res.data._links.people.href)
-        console.log("jsonmsg", res.data)
-        that.setData({
-          //jsonmsg: res.data._links.people.href
-          jsonmsg: res.data
-        })
-      },
-      fail: function (res) {
-        console.log("request failed.")
-        console.log(res)
-      },
-      complete: function () {
-        console.log("request complete.")
-      }
-    })
-*/
   },
 
   /* 弹出/隐藏设置panel */
@@ -309,6 +290,14 @@ Page({
     setting['managingAdministrator'] = false;
     this.setData({
       settingStatus: setting
+    })
+  },
+
+  selectStrategy: function( event ) {
+    console.log('selectStrategy发生change事件，携带strategyIndex值为：', event.detail.value);
+    var idx = event.detail.value;
+    this.setData({
+      strategyIndex: idx
     })
   }
 })

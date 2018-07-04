@@ -67,6 +67,14 @@
                   </picker>
               </view>
           </view>
+          <view class="weui-cell weui-cell_input">
+              <view class="weui-cell">
+                  <view class="datelabel">是否节假日</view>
+              </view>
+              <view class="weui-cell__ft">
+                  <switch checked class="wx-switch-input"/>
+              </view>
+          </view>
         </view>
 
         <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="modifyPoint" data-status="{{settingStatus.modifyPoint}}">
@@ -77,10 +85,25 @@
         </view>
 
         <view wx:if="{{settingStatus.modifyPoint}}">
+          <view class="weui-cell weui-cell_select" style="padding-left: 10px">
+              <view class="weui-cell__hd weui-cell__hd_in-select-after" style="padding-right: 20px;">
+                  <view class="weui-label right-gray">修改策略</view>
+              </view>
+              <view style="color: #888; font-size: 14px; width: 100%;">
+                  <picker bindchange="selectStrategy" value="{{strategyIndex}}" range="{{strategies}}">
+                      <view class="weui-select weui-select_in-select-after">{{strategies[strategyIndex]}}</view>
+                  </picker>
+              </view>
+          </view>
+
           <view class="weui-cell" style="padding-left: 10px">
-            <view class="weui-cell" style="color: #888; font-size: 14px;">修改积分</view>
+              <view class="weui-cell__hd weui-cell__hd_in-select-after">
+                  <view class="weui-label right-gray weui-cell__ft_in-access">选择成员</view>
+              </view>
+              <view class="weui-cell_link" bindtap="ModifyPointSelectAll" style="padding-left: 20px;">积分普调</view>
           </view>
         </view>
+
 
         <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="modifyPassword" data-status="{{settingStatus.modifyPassword}}">
             <view class="weui-cell__bd">
@@ -104,8 +127,8 @@
 
         <view wx:if="{{settingStatus.managingAdministrator}}">
           <view class="weui-cell" style="padding-left: 10px">
-            <view class="weui-cell" style="color: #888; size: 12px;">当前管理员：</view>
-            <view wx:for="{{administrators}}" wx:for-item="admin">
+            <view class="weui-cell right-gray">当前管理员</view>
+            <view wx:for="{{administrators}}" wx:for-item="admin" style="padding-left: 20px;">
               <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">
                 <!--<view bindtap="addAdministrator">添加管理员</view>-->
                 <image src="{{admin.avatarurl}}" style="width: 50px; height: 50px; display: block"/>
@@ -123,8 +146,8 @@
           </view>
 
           <view class="weui-cell" style="padding-left: 10px">
-            <view class="weui-cell" style="color: #888; size: 12px;">添加管理员：</view>
-            <view wx:for="{{adminCandidate}}" wx:for-item="admin">
+            <view class="weui-cell right-gray weui-cell__ft_in-access">添加管理员</view>
+            <view wx:for="{{adminCandidate}}" wx:for-item="admin" style="padding-left: 20px;">
               <view class="weui-cell__hd" style="position: relative;margin-right: 10px;" bindtap="addAdministrator" data-index="{{index}}">
                 <!--<view bindtap="addAdministrator">添加管理员</view>-->
                 <image src="{{admin.avatarurl}}" style="width: 50px; height: 50px; display: block"/>

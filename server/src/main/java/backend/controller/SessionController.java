@@ -30,6 +30,7 @@ import backend.service.LoginService;
 import backend.service.SessionService;
 import backend.service.UserInfoService;
 import backend.util.Debug;
+import backend.util.StaticInfo;
 
 @RestController
 @RequestMapping("/session")
@@ -112,7 +113,7 @@ public class SessionController {
             // Currently user sensitive data not needed
             if ( !Debug.emptyStringExists(ssk, encptdt, ivdt) ) {
                 JSONObject userSensitiveData = loginService.getEncryptedInfo(ssk, encptdt, ivdt);
-                Debug.Log(userSensitiveData.toString());
+                //Debug.Log(userSensitiveData.toString());
                 if(loginService.isValidData(userSensitiveData)) {
                     Debug.Log("Valid user sensitive data.");
                 } else {
@@ -124,29 +125,31 @@ public class SessionController {
             // use UserInfoService
 
             /* Check openId if this the first time login */
+
+            /* Get group info GId in case need */
+            // Currently GId is not needed
             String groupData = data.getGroupData();
             String groupIv = data.getGroupIv();
             if (!Debug.emptyStringExists(groupData, groupIv)) {
-                Debug.Log("groupData: " + groupData + " groupIv: " + groupIv);
+                //Debug.Log("groupData: " + groupData + " groupIv: " + groupIv);
                 try {
                     JSONObject groupInfo = loginService.getEncryptedInfo(ssk, groupData, groupIv);
-                    Debug.Log(groupInfo.toString());
+                    //Debug.Log(groupInfo.toString());
                     if (loginService.isValidData(groupInfo)) {
                         if (groupInfo.has("openGId")) {
                             sessionData.setOpenGId(groupInfo.getString("openGId"));
                         }
                     }
-                    Debug.Log("sessionData: " + sessionData.toString());
-                    String thirdSessionKey = sessionService.getNewSession(serverData.getOpenid(), sessionData);
-                    outString = "{ status: ok, thirdSessionKey: " + thirdSessionKey + "}";
-                    return new JSONObject(outString).toString();
                 } catch(BadPaddingException e) {
                     e.printStackTrace();
                     outString = "Bad encrypted data.";
                     return outString;
                 }
             }
-            return new JSONObject("{status: ok, openGId: " + sessionData.getOpenGId() + "}").toString();
+            //Debug.Log("sessionData: " + sessionData.toString());
+            String thirdSessionKey = sessionService.getNewSession(serverData.getOpenid(), sessionData);
+            outString = String.format("{ status: %s, thirdSessionKey: %s}", StaticInfo.StatusCode.OK, thirdSessionKey);
+            return new JSONObject(outString).toString();
         } catch (Exception e) {
             e.printStackTrace();
             Debug.Log(result);

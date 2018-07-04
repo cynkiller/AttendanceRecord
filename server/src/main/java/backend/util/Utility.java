@@ -86,11 +86,8 @@ public class Utility {
             requestUrl += key + "=" + parms.getString(key) + "&";
         }
         /* GET */
-        RestTemplate restTemplate = new RestTemplate();
         //requestUrl += String.format("?appid=%s&secret=%s&js_code=%s&grant_type=%s", appid, appsecret, code, grant_type);
-        Debug.Log(requestUrl);
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(requestUrl, String.class);
-        return responseEntity.getBody();
+        return UrlRequest(requestUrl);
 
         /* POST WAY
         JSONObject requestUrlParam = new JSONObject();
