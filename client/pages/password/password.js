@@ -1,3 +1,5 @@
+
+const request = require('../../utils/request.js')
 // pages/password/password.js
 Page({
 
@@ -5,9 +7,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    badpassword: false,
-    // mock data
-    goodPassword: '****'
+    badpassword: false
   },
 
   /**
@@ -67,29 +67,45 @@ Page({
   
   }
   */
+
+  passwordCallback: function(data, userpasswd) {
+      if (data == userpasswd) {
+        wx.showToast({
+          title: "梅林你可来了",
+        })
+
+        setTimeout(function () {
+          wx.switchTab({
+            url: '/pages/home/home',
+          });
+        }, 3000)
+
+      } else {
+        this.setData({
+          badpassword: true
+        })
+        var that = this;
+        setTimeout(function () {
+          that.setData({
+            badpassword: false
+          });
+        }, 1000);
+      }
+  },
+
+  verifyLoginCallback: function(data, parm) {
+
+  },
+
   formSubmit: function( event ) {
-    console.log(event.detail.value.passwd)
-    if (this.data.goodPassword == event.detail.value.passwd) {
-      wx.showToast({
-        title: "梅林你可来了",
-      })
-
-      setTimeout(function () {
-        wx.switchTab({
-          url: '/pages/home/home',
-        });
-      }, 3000)
-
-    } else {
-      this.setData({
-        badpassword: true
-      })
-      var that = this;
-      setTimeout(function () {
-        that.setData({
-          badpassword: false
-        });
-      }, 1000);
-    }
+    var userpasswd = event.detail.value.passwd;
+    // get way not safe!
+    request.getRequest("/test/getSecretWord", this.passwordCallback, userpasswd)
+    // post way
+    /*
+    var sendData = wx.getStorageSync('sessionData');
+    sendData['secretWord'] = userpasswd;
+    postRequest("/test/verifyLogin", sendData, verifyLoginCallback, null);
+    */
   }
 })

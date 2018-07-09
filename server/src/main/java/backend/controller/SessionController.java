@@ -47,6 +47,7 @@ public class SessionController {
 
     //private List<SessionData> sessionData;
 
+    /*
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public String getCode(@RequestParam(value="encryptedData", required = false) String encryptedData) {
         if ( encryptedData != null) {
@@ -56,13 +57,14 @@ public class SessionController {
             return "Invalid Code!";
         }
     }
+    */
 
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")
     //@ResponseBody
     //public String postCode( @RequestBody ClientData data) {
     //public String postCode( HttpServletRequest request) throws IOException, JSONException {
     //    String code = request.getParameter("code");
-    public String postCode( @ModelAttribute SessionData.ClientData data,
+    public String session( @ModelAttribute SessionData.ClientData data,
                             @CookieValue(value = "SESSIONID", required = false) String thirdSession)
                             throws  IOException,
                                     JSONException,

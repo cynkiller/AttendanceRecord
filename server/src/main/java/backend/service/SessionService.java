@@ -1,3 +1,7 @@
+/**
+ * Change History:
+ * 
+ */
 package backend.service;
 
 import java.util.List;
@@ -39,7 +43,7 @@ public class SessionService {
      */
     private SessionData getThirdSession(String openid, SessionData sd) {
         // Assumption: openid not registered
-        assert sessionExist(openid) == false;
+        assert sessionExist(openid) == false || sessionExpired(openid);
 
         // Initialise
         SessionData newsd = new SessionData();

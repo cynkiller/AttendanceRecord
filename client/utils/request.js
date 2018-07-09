@@ -1,4 +1,6 @@
-function loginCallback(data) {
+var baseUrl = "";
+
+function loginCallback(data, parm) {
   /*
   if (res.data.openGId) {
     obj.globalData.groupInfo.openGId = res.data.openGId;
@@ -19,9 +21,9 @@ function loginCallback(data) {
   }
 }
 
-function postRequest(_url, sendData, func) {
+function postRequest(_urlalias, sendData, func, parm) {
   wx.request({
-    url: _url,
+    url: baseUrl + _urlalias,
     data: sendData,
     header: {
       'content-type': 'application/x-www-form-urlencoded',
@@ -30,7 +32,7 @@ function postRequest(_url, sendData, func) {
     method: 'POST',
     success: function (res) {
       console.log(res.data)
-      func(res.data);
+      func(res.data, parm);
 
       /*
       wx.showToast({
@@ -48,9 +50,9 @@ function postRequest(_url, sendData, func) {
   })
 }
 
-function getRequest(_url, sendData, func) {
+function getRequest(_urlalias, func, parm = null) {
   wx.request({
-    url: _url,
+    url: baseUrl + _urlalias,
     header: {
       'content-type': 'application/json',
       'Accept': 'application/json'
@@ -58,7 +60,7 @@ function getRequest(_url, sendData, func) {
     method: "GET",
     success: function (res) {
       console.log(res.data)
-      func(res.data)
+      func(res.data, parm)
     },
     fail: function (res) {
       console.log("request failed.")
@@ -104,7 +106,7 @@ const userLogin = obj => {
               wx.setStorageSync('sessionData', sendData)
 
               // 发送 res.code 到后台换取 openId, sessionKey, unionId
-              postRequest('http://<yourhostname>/api/session', sendData, loginCallback)
+              postRequest("/session", sendData, loginCallback, null)
 
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
@@ -119,5 +121,6 @@ const userLogin = obj => {
 }
 
 module.exports = {
-  userLogin: userLogin
+  userLogin: userLogin,
+  getRequest: getRequest
 }
