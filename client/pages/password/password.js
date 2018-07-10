@@ -100,12 +100,15 @@ Page({
   formSubmit: function( event ) {
     var userpasswd = event.detail.value.passwd;
     // get way not safe!
-    request.getRequest("/test/getSecretWord", this.passwordCallback, userpasswd)
+    //request.getRequest("/test/getSecretWord", this.passwordCallback, userpasswd)
     // post way
-    /*
-    var sendData = wx.getStorageSync('sessionData');
+    var sessionData = wx.getStorageSync('sessionData');
+    //var sendData = {};
+    //sendData['sessionData'] = sessionData;
+    //sendData['secretWord'] = userpasswd;
+    var sendData = sessionData;
     sendData['secretWord'] = userpasswd;
-    postRequest("/test/verifyLogin", sendData, verifyLoginCallback, null);
-    */
+    console.log(sendData);
+    request.postRequest("/admin/verifyLogin", sendData, this.verifyLoginCallback, null);
   }
 })

@@ -41,15 +41,15 @@ public class UserInfo {
     }
 
     @Id private String id;
-    private String openid;
-    private String nickName;
+    private String openid;              // must
+    private String nickName;            // must
     private String realName;
     private String voicePart;
-    private String avatarUrl;
+    private String avatarUrl;           // must
     private List<String> groups;
-    private STATE state;
-    private int point;
-    private AUTH authority;
+    private STATE state;                // must
+    private int point;                  // must
+    private AUTH authority;             // must
     private List<RehearsalRecord> record;
     private List<Message> message;
 }

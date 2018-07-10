@@ -6,10 +6,10 @@ function loginCallback(data, parm) {
     obj.globalData.groupInfo.openGId = res.data.openGId;
   }
   */
-  if (!data.status || data.status == "BAD") {
+  if (!data.status || data.status == "CLIENT_BAD_DATA") {
     // 1. bad code => weixin backend problem
     console.log("Remote backend problem. Failed to get thirdSessionKey.")
-  } else if (data.status == "OK" || data.thirdSessionKey) {
+  } else if (data.status == "GENERAL_OK" || data.thirdSessionKey) {
     // 2. good status, get 3rd session id
     wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
     console.log(wx.getStorageSync('thirdSessionKey'))
@@ -122,5 +122,6 @@ const userLogin = obj => {
 
 module.exports = {
   userLogin: userLogin,
+  postRequest: postRequest,
   getRequest: getRequest
 }

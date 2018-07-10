@@ -144,13 +144,13 @@ public class SessionController {
                     }
                 } catch(BadPaddingException e) {
                     e.printStackTrace();
-                    outString = "Bad encrypted data.";
-                    return outString;
+                    outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_DATA);
+                    return new JSONObject(outString).toString();
                 }
             }
             //Debug.Log("sessionData: " + sessionData.toString());
             String thirdSessionKey = sessionService.getNewSession(serverData.getOpenid(), sessionData);
-            outString = String.format("{ status: %s, thirdSessionKey: %s}", StaticInfo.StatusCode.OK, thirdSessionKey);
+            outString = String.format("{ status: %s, thirdSessionKey: %s}", StaticInfo.StatusCode.GENERAL_OK, thirdSessionKey);
             return new JSONObject(outString).toString();
         } catch (Exception e) {
             e.printStackTrace();
