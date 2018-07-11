@@ -1,5 +1,7 @@
 
-const request = require('../../utils/request.js')
+const request = require('../../utils/request.js');
+const util = require('../../utils/util.js');
+
 // pages/password/password.js
 Page({
 
@@ -7,7 +9,9 @@ Page({
    * 页面的初始数据
    */
   data: {
-    badpassword: false
+    badpassword: false,
+    connectionError: false,
+    nopassword: false
   },
 
   /**
@@ -94,7 +98,24 @@ Page({
   },
 
   verifyLoginCallback: function(data, parm) {
+    console.log(data.status)
+    if (!data.status) {
+      util.TempMessage(this, "connectionError");
+    } else if (data.status == "GENERAL_OK") {
+      wx.showToast({
+        title: "梅林你可来了",
+      })
 
+      setTimeout(function () {
+        wx.switchTab({
+          url: '/pages/home/home',
+        });
+      }, 3000)
+    } else if (data.status == "SERVER_NO_SECRETWORD") {
+      util.TempMessage(this, "nopassword");
+    } else if (data.status == "CLIENT_BAD_SECRETWORD") {
+      util.TempMessage(this, "badpassword");
+    }
   },
 
   formSubmit: function( event ) {

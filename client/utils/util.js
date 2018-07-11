@@ -125,11 +125,24 @@ const onloadCheck = (app, obj) => {
     })
   }
 }
+
+const TempMessage = (obj, varname) => {
+  console.log(varname)
+  var data = {};
+  data[varname] = true;
+  obj.setData(data)
+  setTimeout(function () {
+    data[varname] = false;
+    obj.setData(data);
+  }, 1000);    
+}
+
 module.exports = {
   formatTime: formatTime,
   getCurrentPosition: getCurrentPosition,
   getGpsDisance: getGpsDisance,
   toReadableDate: toReadableDate,
   sleep: sleep,
-  onloadCheck: onloadCheck
+  onloadCheck: onloadCheck,
+  TempMessage: TempMessage
 }
