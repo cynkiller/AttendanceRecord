@@ -43,7 +43,7 @@ public class SessionService {
      */
     private SessionData getThirdSession(String openid, SessionData sd) {
         // Assumption: openid not registered
-        assert sessionExist(openid) == false || sessionExpired(openid);
+        assert sessionValid(openid) == false;
 
         // Initialise
         SessionData newsd = new SessionData();
@@ -67,18 +67,34 @@ public class SessionService {
         return false;
     }
 
+    public boolean sessionValid(String openid) {
+        if (sessionExist(openid) && !sessionExpired(openid))
+            return true;
+        return false;
+    }
+
     public String getNewSession(String openid, SessionData sd) {
         Debug.Log("Current timestamp: " + Debug.getTimestamp());
         Debug.Log("Current time: " + Debug.getDatetime());
         Debug.Log("openid: " + openid);
-        if (sessionExist(openid) && !sessionExpired(openid)) {
-            Debug.Log(openid + " exists!", "INFO");
-            return session.get(openid).getThirdSession();
-        }
+        String thirdSession;
+        thirdSession = getSession(openid);
+        if (thirdSession != null) return thirdSession;
+
         SessionData newsd = getThirdSession(openid, sd);
         session.put(openid, newsd);
         idKeyMap.put(newsd.getThirdSession(), openid);
         Debug.Log(session);
-        return session.get(openid).getThirdSession();
+        thirdSession = session.get(openid).getThirdSession();
+        return thirdSession;
+    }
+
+    public String getSession(String openid) {
+        if (sessionValid(openid)) {
+            Debug.Log("Valid openid " + openid + " found!", "INFO");
+            return session.get(openid).getThirdSession();
+        } else {
+            return null;
+        }
     }
 }

@@ -31,6 +31,13 @@ import javax.crypto.BadPaddingException;
 import backend.util.Debug;
 import backend.util.Utility;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParseException;
+import javax.crypto.BadPaddingException;
+import java.io.IOException;
+import backend.model.SessionData;
+import backend.model.ErrorMessage;
+
 @Configuration
 @PropertySource("classpath:application.properties")
 public class LoginService {
@@ -151,4 +158,85 @@ public class LoginService {
         return null;
     }
 
+    public SessionData.ServerData getSessionData(SessionData.ClientData data) {
+        //code = "001ZD0Z42VtzmM0NxRW42vnUY42ZD0Zs";
+        SessionData.ServerData serverData;
+        String code = data.getCode();
+        String result = new String();
+        ObjectMapper mapper = new ObjectMapper();
+        Debug.Log("data:" + data + " Code: " + code);
+
+        try {
+            result = getWeixinOpenidAndSessionkey(code);
+            serverData = mapper.readValue(result, SessionData.ServerData.class);
+            return serverData;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            Debug.Log(result);
+            //ErrorMessage out = mapper.readValue(result, ErrorMessage.class);
+            //Debug.Log(out);
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public JSONObject GetUserSensitiveData(SessionData data) {
+        try {
+            String encptdt = data.getClientData().getEncryptedData();
+            String ivdt = data.getClientData().getIv();
+            String ssk = data.getServerData().getSession_key();
+            JSONObject userSensitiveData;
+            // Currently user sensitive data not needed
+            if ( !Debug.emptyStringExists(ssk, encptdt, ivdt) ) {
+                try {
+                    userSensitiveData = getEncryptedInfo(ssk, encptdt, ivdt);
+                } catch(BadPaddingException e) {
+                    e.printStackTrace();
+                    Debug.Log("Error during get user sensitive data.");
+                    return null;
+                } 
+                Debug.Log(userSensitiveData.toString());
+                if(isValidData(userSensitiveData)) {
+                    Debug.Log("Valid user sensitive data.");
+                    return userSensitiveData;
+                } else {
+                    Debug.Log("Invalid user sensitive data!");
+                    return null;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getGId(SessionData data) {
+        String groupData = data.getClientData().getGroupData();
+        String groupIv = data.getClientData().getGroupIv();
+        String ssk = data.getServerData().getSession_key();
+        if (!Debug.emptyStringExists(groupData, groupIv)) {
+            //Debug.Log("groupData: " + groupData + " groupIv: " + groupIv);
+            try {
+                JSONObject groupInfo = getEncryptedInfo(ssk, groupData, groupIv);
+                //Debug.Log(groupInfo.toString());
+                if (isValidData(groupInfo) && groupInfo.has("openGId")) {
+                    return groupInfo.getString("openGId");
+                } else {
+                    Debug.Log("Invalid groupInfo.");
+                    return null;
+                }
+            } catch(BadPaddingException e) {
+                e.printStackTrace();
+                Debug.Log("Error during get group info.");
+                return null;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return null;
+    }
 }

@@ -35,7 +35,10 @@ App({
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
 
-    req.userLogin(this)
+    // User login
+    req.weixinUserLogin(this)
+    req.backendLogin(this)
+
   },
   globalData: {
     userInfo: null,

@@ -19,6 +19,15 @@ public class SessionData {
         private String iv;
         private String groupData;
         private String groupIv;
+
+        public ClientData() {}
+        public ClientData(String code, String encryptedData, String iv, String groupData, String groupIv) {
+            this.code = code;
+            this.encryptedData = encryptedData;
+            this.iv = iv;
+            this.groupData = groupData;
+            this.groupIv = groupIv;
+        }
     }
 
     ServerData serverData;

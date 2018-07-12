@@ -1,4 +1,5 @@
 
+const app = getApp();
 const request = require('../../utils/request.js');
 const util = require('../../utils/util.js');
 
@@ -115,6 +116,9 @@ Page({
       util.TempMessage(this, "nopassword");
     } else if (data.status == "CLIENT_BAD_SECRETWORD") {
       util.TempMessage(this, "badpassword");
+    } else if (data.status == "CLIENT_BAD_DATA") {
+      // 重新登录
+      request.weixinUserLogin(app);
     }
   },
 
@@ -123,6 +127,9 @@ Page({
     // get way not safe!
     //request.getRequest("/test/getSecretWord", this.passwordCallback, userpasswd)
     // post way
+
+    // login again, because the previous session code is out-dated for backend query
+    request.weixinUserLogin(app);
     var sessionData = wx.getStorageSync('sessionData');
     //var sendData = {};
     //sendData['sessionData'] = sessionData;

@@ -75,90 +75,61 @@ public class SessionController {
             @RequestParam(value="encryptedData", required = false) String encryptedData,
             @RequestParam(value="code", required = false) String code,
             @RequestParam(value="iv", required = false) String iv) {*/
+                
+        String outString;
+        String thirdSessionKey;
         SessionData sessionData = new SessionData();
         sessionData.setClientData(data);
-         String code = data.getCode();
-        //code = "001ZD0Z42VtzmM0NxRW42vnUY42ZD0Zs";
-        Debug.Log("data:" + data + " Code: " + code);
-        String result = loginService.getWeixinOpenidAndSessionkey(code);
-        String outString;
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            SessionData.ServerData serverData = mapper.readValue(result, SessionData.ServerData.class);
-            sessionData.setServerData(serverData);
-            Debug.Log(serverData);
-            //outString = new JSONObject(out).toString();
-            /**
-             * Verify identity 
-             * 1. Check if openid already in sessionData. Expired or not.
-             *  1.1 Not expired. Return the session id directly.
-             *  1.2 Not in sessionData or expired.
-             *      1.2.1 Check if openid already registered (in database)
-             *      1.2.2 If registered, record client and server data,
-                          calculate expiretime, create new session id
-                          and return the id
-             *      1.2.3 If not registered, judge if the user can be authorized
-             *          1.2.3.1 Cannot be authorized, return error
-             *          1.2.3.2 Can be authorized, add new user into database
-             */
+        SessionData.ServerData serverData;
+        serverData = loginService.getSessionData(data);
+        if (serverData == null) {
+            outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_DATA);
+            return new JSONObject(outString).toString();
+        }
+        sessionData.setServerData(serverData);
+    
+        //outString = new JSONObject(out).toString();
+        /**
+         * Verify identity 
+         * 1. Check if openid exists in database. if not, return SERVER_NO_USER
+         * 2. Check if valid session exists is session service. if yes, return this session key.
+         * 3. Valid user and invalid session data. Get user infomation, add to new session and return to user.
+         */
+        String openid = serverData.getOpenid();
+        if (!userInfoService.openidExists(openid)) {
+            // User not exist in database
+            outString = String.format("{ status: %s}", StaticInfo.StatusCode.SERVER_NO_USER);
+            return new JSONObject(outString).toString();
+        }
+        Debug.Log("Openid exists in the database. Verification passed.");
 
-            if (userInfoService.openidExists(serverData.getOpenid())) {
-                Debug.Log("Openid exists in the database. Verification passed.");
-                // find existing 3rdsessionid
-                return sessionService.getNewSession(serverData.getOpenid(), sessionData);
-            }
-
+        if ( !sessionService.sessionValid(openid)) {
             /* Get user sensitive data and group info in case needed */
-            String encptdt = data.getEncryptedData();
-            String ivdt = data.getIv();
-            String ssk = serverData.getSession_key();
-            // Currently user sensitive data not needed
-            if ( !Debug.emptyStringExists(ssk, encptdt, ivdt) ) {
-                JSONObject userSensitiveData = loginService.getEncryptedInfo(ssk, encptdt, ivdt);
-                //Debug.Log(userSensitiveData.toString());
-                if(loginService.isValidData(userSensitiveData)) {
-                    Debug.Log("Valid user sensitive data.");
-                } else {
-                    Debug.Log("Invalid user sensitive data!");
-                }
+            JSONObject userSensitiveData = loginService.GetUserSensitiveData(sessionData);
+            if (serverData == null) {
+                outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_DATA);
+                return new JSONObject(outString).toString();
             }
-
-            /* Check if openid exist in the database */
-            // use UserInfoService
-
-            /* Check openId if this the first time login */
 
             /* Get group info GId in case need */
             // Currently GId is not needed
             String groupData = data.getGroupData();
             String groupIv = data.getGroupIv();
             if (!Debug.emptyStringExists(groupData, groupIv)) {
-                //Debug.Log("groupData: " + groupData + " groupIv: " + groupIv);
-                try {
-                    JSONObject groupInfo = loginService.getEncryptedInfo(ssk, groupData, groupIv);
-                    //Debug.Log(groupInfo.toString());
-                    if (loginService.isValidData(groupInfo)) {
-                        if (groupInfo.has("openGId")) {
-                            sessionData.setOpenGId(groupInfo.getString("openGId"));
-                        }
-                    }
-                } catch(BadPaddingException e) {
-                    e.printStackTrace();
+                String groupId = loginService.getGId(sessionData);
+                if (groupId != null) {
+                    sessionData.setOpenGId(groupId);
+                } else {
                     outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_DATA);
-                    return new JSONObject(outString).toString();
+                    return new JSONObject(outString).toString();                
                 }
             }
             //Debug.Log("sessionData: " + sessionData.toString());
-            String thirdSessionKey = sessionService.getNewSession(serverData.getOpenid(), sessionData);
-            outString = String.format("{ status: %s, thirdSessionKey: %s}", StaticInfo.StatusCode.GENERAL_OK, thirdSessionKey);
-            return new JSONObject(outString).toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Debug.Log(result);
-            ErrorMessage out = mapper.readValue(result, ErrorMessage.class);
-            Debug.Log(out);
-            outString = new JSONObject(out).toString();
-            return outString;
+            thirdSessionKey = sessionService.getNewSession(openid, sessionData);
+        } else {
+            thirdSessionKey = sessionService.getSession(openid);
         }
+        outString = String.format("{ status: %s, thirdSessionKey: %s}", StaticInfo.StatusCode.GENERAL_OK, thirdSessionKey);
+        return new JSONObject(outString).toString();
     }
 }

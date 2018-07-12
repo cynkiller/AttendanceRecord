@@ -13,10 +13,10 @@ function loginCallback(data, parm) {
     // 2. good status, get 3rd session id
     wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
     console.log(wx.getStorageSync('thirdSessionKey'))
-  } else if (data.status == "NO_USER") {
+  } else if (data.status == "SERVER_NO_USER") {
     // 3. not registered => verify page => enter verify key / ask user to open in certain group chat
     wx.navigateTo({
-      url: '../pages/password/password',
+      url: '/pages/password/password',
     })
   }
 }
@@ -72,7 +72,13 @@ function getRequest(_urlalias, func, parm = null) {
   })
 }
 
-const userLogin = obj => {
+const backendLogin = obj => {
+    // 发送 res.code 到后台换取 openId, sessionKey, unionId
+    var sendData = wx.getStorageSync('sessionData')
+    postRequest("/session", sendData, loginCallback, null)
+}
+
+const weixinUserLogin = obj => {
     // 登录
     wx.login({
       success: res => {
@@ -105,9 +111,6 @@ const userLogin = obj => {
               sendData['groupIv'] = obj.globalData.groupInfo.iv;
               wx.setStorageSync('sessionData', sendData)
 
-              // 发送 res.code 到后台换取 openId, sessionKey, unionId
-              postRequest("/session", sendData, loginCallback, null)
-
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
               if (obj.userInfoReadyCallback) {
@@ -121,7 +124,8 @@ const userLogin = obj => {
 }
 
 module.exports = {
-  userLogin: userLogin,
+  weixinUserLogin: weixinUserLogin,
   postRequest: postRequest,
-  getRequest: getRequest
+  getRequest: getRequest,
+  backendLogin: backendLogin
 }

@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import java.util.List;
 import lombok.Data;
 
+import backend.util.StaticInfo;
+
 @Data
 public class UserInfo {
     public enum STATE {
@@ -12,17 +14,17 @@ public class UserInfo {
     }
 
     public enum AUTH {
+        MEMBER,
         ROOT,
         SUPERADMIN,
-        ADMIN,
-        MEMBER
+        ADMIN
     }
 
     public enum ATTEND {
+        ABSENCE,
         ON_TIME,
         ASK_LEAVE,
-        LATE,
-        ABSENCE
+        LATE
     }
 
     @Data
@@ -52,4 +54,14 @@ public class UserInfo {
     private AUTH authority;             // must
     private List<RehearsalRecord> record;
     private List<Message> message;
+
+    public UserInfo() {}
+    public UserInfo(String openid, String nickName, String avatarUrl) {
+        this.openid = openid;
+        this.nickName = nickName;
+        this.avatarUrl = avatarUrl;
+        this.state = StaticInfo.DEFAULT_STATE;
+        this.point = StaticInfo.DEFAULT_POINT;
+        this.authority = StaticInfo.DEFAULT_AUTH;
+    }
 }

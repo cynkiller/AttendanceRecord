@@ -8,5 +8,5 @@ public interface UserInfoRepository extends MongoRepository<UserInfo, String> {
     List<UserInfo> findByOpenid(String openid);
     List<UserInfo> findAll();
     long countByOpenid(String openid);
-    UserInfo insert(UserInfo userInfo);
+    //UserInfo insert(UserInfo userInfo);
 }
