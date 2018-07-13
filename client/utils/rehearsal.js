@@ -1,3 +1,5 @@
+const util = require("util.js");
+
 function timestamps(obj) {
   var timestamps = {};
   var rehearsalDate = obj.data.rehearsalDate;
@@ -10,17 +12,17 @@ function timestamps(obj) {
   var time = rehearsalDate.startTime.split(":");
   date.setHours(parseInt(time[0]), parseInt(time[1]));
   var startTimestamp = date.getTime();
-  console.log("Start Date", date, "Start timestamp: ", startTimestamp)
+  util.debug("Start Date", date, "Start timestamp: ", startTimestamp)
 
   // end time
   time = rehearsalDate.endTime.split(":");
   date.setHours(parseInt(time[0]), parseInt(time[1]));
   var endTimestamp = date.getTime();
-  console.log("End Date", date, "End timestamp: ", endTimestamp)
+  util.debug("End Date", date, "End timestamp: ", endTimestamp)
 
   var currentdate = new Date();
   var currentTimestamp = currentdate.getTime();
-  console.log("Current Date", currentdate, "Current timestamp", currentTimestamp)
+  util.debug("Current Date", currentdate, "Current timestamp", currentTimestamp)
 
   timestamps['start'] = startTimestamp;
   timestamps['end'] = endTimestamp;

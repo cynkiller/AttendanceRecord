@@ -99,7 +99,7 @@ Page({
   },
 
   verifyLoginCallback: function(data, parm) {
-    console.log(data.status)
+    util.debug(data.status)
     if (!data.status) {
       util.TempMessage(this, "connectionError");
     } else if (data.status == "GENERAL_OK") {
@@ -136,7 +136,7 @@ Page({
     //sendData['secretWord'] = userpasswd;
     var sendData = sessionData;
     sendData['secretWord'] = userpasswd;
-    console.log(sendData);
+    util.debug(sendData);
     request.postRequest("/admin/verifyLogin", sendData, this.verifyLoginCallback, null);
   }
 })

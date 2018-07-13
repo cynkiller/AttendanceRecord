@@ -1,6 +1,7 @@
 //app.js
 
 const req = require('utils/request.js')
+const util = require('utils/util.js')
 
 App({
 
@@ -8,26 +9,26 @@ App({
 
     var that = this;
     if (ops.scene == 1044) {
-      console.log(ops.shareTicket)
+      util.debug(ops.shareTicket)
       that.globalData.shareTicket = ops.shareTicket
       // 获取群信息
       // retry twice
       wx.getShareInfo({
         shareTicket: this.globalData.shareTicket,
         success: res => {
-          console.log("SUCCESS: " + res)
+          util.debug("SUCCESS: " + res)
           that.globalData.groupInfo.encryptedData = res.encryptedData;
           that.globalData.groupInfo.iv = res.iv;
         },
         fail: res => {
-          console.log("fail: " + res)
+          util.debug("fail: " + res)
         },
         complete: res => {
-          console.log("complete: " + res)
+          util.debug("complete: " + res)
         }
       })
     } else {
-      console.log(ops)
+      util.debug(ops)
     }
   
     // 展示本地存储能力

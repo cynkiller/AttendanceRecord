@@ -1,5 +1,7 @@
 var baseUrl = "";
 
+const util = require('util.js');
+
 function loginCallback(data, parm) {
   /*
   if (res.data.openGId) {
@@ -7,20 +9,20 @@ function loginCallback(data, parm) {
   }
   */
   if (!data.status) {
-    console.log("Remote backend problem. Failed to get thirdSessionKey.")
+    util.info("Remote backend problem. Failed to get thirdSessionKey.")
     wx.reLaunch({
       url: '/pages/prelogin/prelogin?info=backend',
     })
   } else if(data.status == "CLIENT_BAD_DATA") {
     // 1. bad code => weixin backend problem
-    console.log("Failed to get user information.")
+    util.info("Failed to get user information.")
     wx.reLaunch({
       url: '/pages/prelogin/prelogin?info=user',
     })
   } else if (data.status == "GENERAL_OK" || data.thirdSessionKey) {
     // 2. good status, get 3rd session id
     wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
-    console.log(wx.getStorageSync('thirdSessionKey'))
+    util.debug(wx.getStorageSync('thirdSessionKey'))
   } else if (data.status == "SERVER_NO_USER") {
     // 3. not registered => verify page => enter verify key / ask user to open in certain group chat
     wx.reLaunch({
@@ -39,7 +41,7 @@ function postRequest(_urlalias, sendData, func, parm) {
     },
     method: 'POST',
     success: function (res) {
-      console.log(res.data)
+      util.debug(res.data)
       func(res.data, parm);
 
       /*
@@ -50,7 +52,7 @@ function postRequest(_urlalias, sendData, func, parm) {
       */
     },
     fail: function (res) {
-      console.log(res.data)
+      util.debug(res.data)
       wx.navigateTo({
         url: '/pages/prelogin/prelogin',
       })
@@ -70,15 +72,15 @@ function getRequest(_urlalias, func, parm = null) {
     },
     method: "GET",
     success: function (res) {
-      console.log(res.data)
+      util.debug(res.data)
       func(res.data, parm)
     },
     fail: function (res) {
-      console.log("request failed.")
-      console.log(res)
+      util.info("getRequest request failed.")
+      util.debug(res)
     },
     complete: function () {
-      console.log("request complete.")
+      util.info("getRequest request complete.")
     }
   })
 }
@@ -93,7 +95,7 @@ const weixinUserLogin = obj => {
     // 登录
     wx.login({
       success: res => {
-        console.log(res);
+        util.debug(res);
         obj.globalData.code = res.code;
       }
     })
@@ -101,7 +103,7 @@ const weixinUserLogin = obj => {
     // 获取用户信息
     wx.getSetting({
       success: res => {
-        console.log(res);
+        util.debug(res);
         if (res.authSetting['scope.userInfo']) {
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           wx.getUserInfo({

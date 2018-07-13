@@ -53,7 +53,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    console.log(this.data.addressBook);
+    util.debug(this.data.addressBook);
     // fake data
     var strtgs = []
     for (var i = 0; i < 60; i++) {
@@ -129,11 +129,11 @@ Page({
     wx.chooseLocation({
       success: function (res) {
         // success
-        console.log(res, "location")
-        console.log(res.name)
-        console.log(res.address)
-        console.log(res.latitude)
-        console.log(res.longitude)
+        util.debug(res, "location")
+        util.debug(res.name)
+        util.debug(res.address)
+        util.debug(res.latitude)
+        util.debug(res.longitude)
 
         var address = {};
         address['name'] = res.name;
@@ -143,7 +143,7 @@ Page({
         address['checked'] = false;
 
         app.rehearsalInfo.addressBook.push(address);
-        console.log(app.rehearsalInfo.addressBook)
+        util.debug(app.rehearsalInfo.addressBook)
         that.setData({
           addressBook: app.rehearsalInfo.addressBook
         })
@@ -164,9 +164,6 @@ Page({
         // complete
       }
     })
-    console.log(app.globalData.userInfo.nickName)
-    console.log(app.globalData.userInfo.avatarUrl)
-    console.log("global addressBook", app.rehearsalInfo.addressBook)
   },
 
   /* 弹出/隐藏设置panel */
@@ -183,7 +180,7 @@ Page({
 
   /* 更新排练地址 */
   updateAddress: function( event ) {
-    console.log('radio发生change事件，携带value值为：', event.detail.value);
+    util.debug('radio发生change事件，携带value值为：', event.detail.value);
 
     var selectAddress = event.detail.value;
     var addressBook = this.data.addressBook;
@@ -206,7 +203,7 @@ Page({
 
   /* 更新排练日期 */
   bindDateChange: function( event ) {
-    console.log('date发生change事件，携带value值为：', event.detail.value);
+    util.debug('date发生change事件，携带value值为：', event.detail.value);
     app.rehearsalInfo.rehearsalDate.date = event.detail.value;
     var rehearsalDate = this.data.rehearsalDate;
     rehearsalDate.date = event.detail.value;
@@ -218,7 +215,7 @@ Page({
 
   /* 更新开始排练时间 */
   bindStartTimeChange: function( event ) {
-    console.log('startTime发生change事件，携带value值为：', event.detail.value);
+    util.debug('startTime发生change事件，携带value值为：', event.detail.value);
     app.rehearsalInfo.rehearsalDate.startTime = event.detail.value;
     var rehearsalDate = this.data.rehearsalDate;
     rehearsalDate.startTime = event.detail.value;
@@ -229,7 +226,7 @@ Page({
 
   /* 更新结束排练时间 */
   bindEndTimeChange: function (event) {
-    console.log('endTime发生change事件，携带value值为：', event.detail.value);
+    util.debug('endTime发生change事件，携带value值为：', event.detail.value);
     app.rehearsalInfo.rehearsalDate.endTime = event.detail.value;
     var rehearsalDate = this.data.rehearsalDate;
     rehearsalDate.endTime = event.detail.value;
@@ -239,7 +236,7 @@ Page({
   },
 
   addAdministrator: function (event) {
-    console.log('addAdministrator发生change事件，携带idx值为：', event.currentTarget.dataset.index);
+    util.debug('addAdministrator发生change事件，携带idx值为：', event.currentTarget.dataset.index);
     var idx = event.currentTarget.dataset.index;
     var admins = this.data.administrators;
     var candidates = this.data.adminCandidate;
@@ -260,7 +257,7 @@ Page({
     })
   },
   removeAdministrator: function (event) {
-    console.log('removeAdministrator发生change事件，携带index值为：', event.currentTarget.dataset.index);
+    util.log('removeAdministrator发生change事件，携带index值为：', event.currentTarget.dataset.index);
     var idx = event.currentTarget.dataset.index;
     var admins = this.data.administrators;
     var candidate = admins[idx];
@@ -294,7 +291,7 @@ Page({
   },
 
   selectStrategy: function( event ) {
-    console.log('selectStrategy发生change事件，携带strategyIndex值为：', event.detail.value);
+    util.log('selectStrategy发生change事件，携带strategyIndex值为：', event.detail.value);
     var idx = event.detail.value;
     this.setData({
       strategyIndex: idx

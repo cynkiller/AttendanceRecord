@@ -68,13 +68,13 @@ Page({
     wx.authorize({
       scope: "scope.userLocation",
       success: function(res) {
-        console.log("success", res.errMsg)
+        util.debug("success", res.errMsg)
       },
       fail: function(res) {
-        console.log("fail", res.errMsg)
+        util.debug("fail", res.errMsg)
       },
       complete: function(res) {
-        console.log("complete", res.errMsg)
+        util.debug("complete", res.errMsg)
       }
     })
 
@@ -111,14 +111,14 @@ Page({
       markers: this.data.markers,
       includePoints: this.data.includePoints
     })
-    console.log(this.data.markers);
+    util.debug(this.data.markers);
     util.getCurrentPosition(this);
     var distance = util.getGpsDisance(
           this.data.includePoints[0].latitude,
           this.data.includePoints[0].longitude,
           this.data.includePoints[1].latitude,
           this.data.includePoints[1].longitude);
-    console.log("distance:", distance)
+    util.debug("distance:", distance)
     var remain = rehearsal.getRemainTime(this);
     if (rehearsal.isValidSigninTime(this) && this.data.signined == false && distance <= 10) {
       remain = (remain / 1000 / 60 / 60).toFixed(2);

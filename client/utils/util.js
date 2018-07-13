@@ -137,6 +137,15 @@ const TempMessage = (obj, varname) => {
   }, 1000);    
 }
 
+const debug = msg => {
+  // To be removed in production
+  console.log(msg)
+}
+
+const info = msg => {
+  console.log(msg)
+}
+
 module.exports = {
   formatTime: formatTime,
   getCurrentPosition: getCurrentPosition,
@@ -144,5 +153,7 @@ module.exports = {
   toReadableDate: toReadableDate,
   sleep: sleep,
   onloadCheck: onloadCheck,
-  TempMessage: TempMessage
+  TempMessage: TempMessage,
+  debug: debug,
+  info: info
 }

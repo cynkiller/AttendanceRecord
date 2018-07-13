@@ -53,7 +53,7 @@ Page({
     })
   },
   getUserInfo: function(e) {
-    console.log(e)
+    util.debug(e)
     app.globalData.userInfo = e.detail.userInfo
     this.setData({
       userInfo: e.detail.userInfo,
@@ -65,7 +65,7 @@ Page({
       title: "打卡神器",
       path: "/pages/index/index",
       success(res) {
-        console.log(res)
+        util.debug(res)
       }
     }
   },
@@ -82,16 +82,16 @@ Page({
       confirmText: "确认",
       cancelText: "再想想",
       success: function (res) {
-        console.log(res);
+        util.debug(res);
         if (res.confirm) {
-          console.log('用户点击主操作')
+          util.debug('用户点击主操作')
           // TBD: update database
           // TBD: check result
           wx.showToast({
             title: '请假成功',
           })
         } else {
-          console.log('用户点击辅助操作')
+          util.debug('用户点击辅助操作')
         }
       }
     });
