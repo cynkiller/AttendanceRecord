@@ -100,6 +100,7 @@ Page({
 
   verifyLoginCallback: function(data, parm) {
     util.debug(data.status)
+    wx.hideLoading()
     if (!data.status) {
       util.TempMessage(this, "connectionError");
     } else if (data.status == "GENERAL_OK") {
@@ -137,6 +138,9 @@ Page({
     var sendData = sessionData;
     sendData['secretWord'] = userpasswd;
     util.debug(sendData);
+    wx.showLoading({
+      title: '身份验证中...'
+    })
     request.postRequest("/admin/verifyLogin", sendData, this.verifyLoginCallback, null);
   }
 })
