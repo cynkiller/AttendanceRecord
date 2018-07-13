@@ -6,16 +6,24 @@ function loginCallback(data, parm) {
     obj.globalData.groupInfo.openGId = res.data.openGId;
   }
   */
-  if (!data.status || data.status == "CLIENT_BAD_DATA") {
-    // 1. bad code => weixin backend problem
+  if (!data.status) {
     console.log("Remote backend problem. Failed to get thirdSessionKey.")
+    wx.reLaunch({
+      url: '/pages/prelogin/prelogin?info=backend',
+    })
+  } else if(data.status == "CLIENT_BAD_DATA") {
+    // 1. bad code => weixin backend problem
+    console.log("Failed to get user information.")
+    wx.reLaunch({
+      url: '/pages/prelogin/prelogin?info=user',
+    })
   } else if (data.status == "GENERAL_OK" || data.thirdSessionKey) {
     // 2. good status, get 3rd session id
     wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
     console.log(wx.getStorageSync('thirdSessionKey'))
   } else if (data.status == "SERVER_NO_USER") {
     // 3. not registered => verify page => enter verify key / ask user to open in certain group chat
-    wx.navigateTo({
+    wx.reLaunch({
       url: '/pages/password/password',
     })
   }
@@ -43,6 +51,9 @@ function postRequest(_urlalias, sendData, func, parm) {
     },
     fail: function (res) {
       console.log(res.data)
+      wx.navigateTo({
+        url: '/pages/prelogin/prelogin',
+      })
     },
     complete: function (res) {
       //console.log(res.data)

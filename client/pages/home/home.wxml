@@ -1,4 +1,5 @@
 <!--pages/home/home.wxml-->
+<view wx:if="{{showpage}}">
 <view class="page">
     <view class="page__hd">
         <view class="page__title">排练信息</view>
@@ -54,4 +55,10 @@
         </view>
         <view class="weui-footer__text">Copyright © 2018- </view>
     </view>
+</view>
+</view>
+<view wx:else>
+  <view style="text-align: center; vertical-align: middle; height: 50%;">
+    <view style="position: relative">登录中...</view>
+  </view>
 </view>

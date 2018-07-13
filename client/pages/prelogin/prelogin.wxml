@@ -1,0 +1,4 @@
+<!--pages/prelogin/prelogin.wxml-->
+<view style="display: table-cell; vertical-align: middle; text-align: center;">
+<text>{{info}}。。。登录失败TT</text>
+</view>

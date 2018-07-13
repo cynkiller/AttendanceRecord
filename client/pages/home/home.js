@@ -11,6 +11,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    showpage: false,
     disableSignin: false,
     signined: false,
     distance: null,
@@ -75,6 +76,10 @@ Page({
       complete: function(res) {
         console.log("complete", res.errMsg)
       }
+    })
+
+    this.setData({
+      showpage: true
     })
   },
 
