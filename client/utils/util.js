@@ -137,12 +137,19 @@ const TempMessage = (obj, varname) => {
   }, 1000);    
 }
 
-const debug = msg => {
+const navigate =  event => {
+  var target = event.currentTarget.dataset.target;
+  wx.navigateTo({
+    url: '/pages/' + target + '/' + target,
+  })
+}
+
+const debug = (...msg) => {
   // To be removed in production
   console.log(msg)
 }
 
-const info = msg => {
+const info = (...msg) => {
   console.log(msg)
 }
 
@@ -154,6 +161,7 @@ module.exports = {
   sleep: sleep,
   onloadCheck: onloadCheck,
   TempMessage: TempMessage,
+  navigate: navigate,
   debug: debug,
   info: info
 }

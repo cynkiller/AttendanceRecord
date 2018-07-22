@@ -1,10 +1,15 @@
 // pages/prelogin/prelogin.js
+const req = require('../../utils/request.js')
+const util = require('../../utils/util.js')
+const app = getApp()
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
+    canIUse: false,
     info: null
   },
 
@@ -16,9 +21,15 @@ Page({
     switch(options['info']) {
       case "user":
         msg = "数据解析错误";
+        this.setData({
+          canIUse: false
+        })
         break;
       case "backend":
         msg = "Oops, 服务器挂啦";
+        this.setData({
+          canIUse: true
+        })
         break;
     }
     this.setData({
@@ -73,5 +84,22 @@ Page({
    */
   onShareAppMessage: function () {
   
+  },
+
+  getUserInfo: function (e) {
+    util.debug(e)
+    app.globalData.userInfo = e.detail.userInfo
+    // User login
+    wx.showLoading({
+      title: '登陆中',
+    })
+    req.weixinUserLogin(app, this.goodlogin)
+  },
+
+  goodlogin: function () {
+    wx.hideLoading()
+    wx.reLaunch({
+      url: '/pages/home/home',
+    })
   }
 })

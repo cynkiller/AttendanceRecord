@@ -10,30 +10,9 @@ const util = require('../../utils/util.js')
 
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {},
-    hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     administrator: true,
-    superuser: true,
-    markers: [
-      {
-        id: 0,
-        iconPath: "/resource/position.png",
-        longitude: app.globalData.defaultlongitude,
-        latitude: app.globalData.defaultlatitude,
-        width: 30,
-        height: 30,
-      }, // destination
-      {}  // current location    
-    ],
-    includePoints: [
-      {
-        longitude: app.globalData.defaultlongitude,
-        latitude: app.globalData.defaultlatitude,
-      },
-      {}
-    ]
+    superuser: true
   },
   //事件处理函数
   bindViewTap: function() {
@@ -70,10 +49,7 @@ Page({
     }
   },
   navigate: function(event) {
-    var target = event.currentTarget.dataset.target;
-    wx.navigateTo({
-      url: '../' + target + '/' + target,
-    })
+    util.navigate(event)
   },
   askleave: function() {
     wx.showModal({

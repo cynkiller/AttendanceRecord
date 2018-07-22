@@ -3,6 +3,7 @@
 //获取应用实例
 const app = getApp()
 const util = require('../../utils/util.js')
+const req = require('../../utils/request.js')
 const rehearsal = require('../../utils/rehearsal.js')
 
 Page({
@@ -48,12 +49,33 @@ Page({
     wx.showShareMenu({
       withShareTicket: true //要求小程序返回分享目标信息
     })
+
+    req.weixinUserLogin(app, this.showpage)
+
+
+    // 地理位置权限
+    wx.authorize({
+      scope: "scope.userLocation",
+      success: function (res) {
+        util.debug("userLocation success", res.errMsg)
+      },
+      fail: function (res) {
+        util.debug("userLocation fail", res.errMsg)
+      },
+      complete: function (res) {
+        util.debug("userLocation complete", res.errMsg)
+      }
+    })
+
     wx.getSetting({
-      success: function(res) {
-        if (! res.authSetting['scope.userLocation']) {
+      success: function (res) {
+        if (!res.authSetting['scope.userLocation']) {
+          wx.showToast({
+            title: '小程序需要地理位置权限'
+          })
           wx.openSetting({
-            success: function(res) {
-              if( ! res.authSetting['scope.userLocation']) {
+            success: function (res) {
+              if (!res.authSetting['scope.userLocation']) {
                 wx.showToast({
                   title: '获取地理位置失败',
                 })
@@ -64,20 +86,10 @@ Page({
         }
       }
     })
-    // 地理位置权限
-    wx.authorize({
-      scope: "scope.userLocation",
-      success: function(res) {
-        util.debug("success", res.errMsg)
-      },
-      fail: function(res) {
-        util.debug("fail", res.errMsg)
-      },
-      complete: function(res) {
-        util.debug("complete", res.errMsg)
-      }
-    })
 
+  },
+
+  showpage: function() {
     this.setData({
       showpage: true
     })
@@ -90,12 +102,17 @@ Page({
   
   },
 
+  onPullDownRefresh: function() {
+  },
+
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    this.onShowOperation();
-    this.data.interval = setInterval(this.onShowOperation, 60000);
+    if(this.showpage) {
+      this.onShowOperation();
+      this.data.interval = setInterval(this.onShowOperation, 60000);
+    }
   },
 
   onShowOperation() {
@@ -152,7 +169,8 @@ Page({
    */
   onHide: function () {
     // 停止polling地理位置和时间
-    clearInterval(this.data.interval);  
+    if(this.showpage)
+        clearInterval(this.data.interval);  
   },
 
   /**

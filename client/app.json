@@ -5,7 +5,9 @@
     "pages/logs/logs",
     "pages/setting/setting",
     "pages/detail/detail",
-    "pages/password/password"
+    "pages/password/password",
+    "pages/prelogin/prelogin",
+    "pages/userinfo/userinfo"
   ],
   "window": {
     "backgroundTextStyle": "#FFF",

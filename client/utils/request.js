@@ -2,7 +2,8 @@ var baseUrl = "";
 
 const util = require('util.js');
 
-function loginCallback(data, parm) {
+function loginCallback(data, func) {
+  util.info("enter loginCallback")
   /*
   if (res.data.openGId) {
     obj.globalData.groupInfo.openGId = res.data.openGId;
@@ -23,6 +24,8 @@ function loginCallback(data, parm) {
     // 2. good status, get 3rd session id
     wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
     util.debug(wx.getStorageSync('thirdSessionKey'))
+    getApp().loginReady = true;
+    if(func) func()
   } else if (data.status == "SERVER_NO_USER") {
     // 3. not registered => verify page => enter verify key / ask user to open in certain group chat
     wx.reLaunch({
@@ -54,7 +57,7 @@ function postRequest(_urlalias, sendData, func, parm) {
     fail: function (res) {
       util.debug(res.data)
       wx.navigateTo({
-        url: '/pages/prelogin/prelogin',
+        url: '/pages/prelogin/prelogin?info=backend',
       })
     },
     complete: function (res) {
@@ -85,13 +88,22 @@ function getRequest(_urlalias, func, parm = null) {
   })
 }
 
-const backendLogin = obj => {
+const backendLogin = func => {
     // 发送 res.code 到后台换取 openId, sessionKey, unionId
     var sendData = wx.getStorageSync('sessionData')
-    postRequest("/session", sendData, loginCallback, null)
+    util.debug("backendLogin: ", sendData)
+    postRequest("/session", sendData, loginCallback, func)
 }
 
-const weixinUserLogin = obj => {
+const weixinUserLogin = (obj, func) => {
+    util.debug("enter weixinUserLogin")
+
+    // 检查是否已经登录
+    if (obj.loginReady) {
+      func();
+      return
+    }
+  
     // 登录
     wx.login({
       success: res => {
@@ -104,11 +116,13 @@ const weixinUserLogin = obj => {
     wx.getSetting({
       success: res => {
         util.debug(res);
+        util.debug("getSetting success:", res)
         if (res.authSetting['scope.userInfo']) {
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           wx.getUserInfo({
             withCredentials: true,
             success: res => {
+              util.debug("getUserInfo success:", res)
               // 可以将 res 发送给后台解码出 unionId
               // console.log(res)
               obj.globalData.userInfo = res.userInfo
@@ -124,14 +138,27 @@ const weixinUserLogin = obj => {
               sendData['groupIv'] = obj.globalData.groupInfo.iv;
               wx.setStorageSync('sessionData', sendData)
 
+              // Connect server for session establish
+              backendLogin(func)
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
               if (obj.userInfoReadyCallback) {
                 obj.userInfoReadyCallback(res)
               }
+            },
+            fail: res => {
+              util.debug("getUserInfo fail:", res)
             }
           })
+        } else {
+          util.info("weixinUserLogin failed to get user information.")
+          wx.reLaunch({
+            url: '/pages/prelogin/prelogin?info=user',
+          })
         }
+      },
+      fail: res => {
+        util.debug("getSetting fail:", res)
       }
     })
 }
@@ -139,6 +166,5 @@ const weixinUserLogin = obj => {
 module.exports = {
   weixinUserLogin: weixinUserLogin,
   postRequest: postRequest,
-  getRequest: getRequest,
-  backendLogin: backendLogin
+  getRequest: getRequest
 }

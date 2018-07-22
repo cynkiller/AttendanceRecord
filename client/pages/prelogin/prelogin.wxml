@@ -1,4 +1,5 @@
 <!--pages/prelogin/prelogin.wxml-->
-<view style="display: table-cell; vertical-align: middle; text-align: center;">
-<text>{{info}}。。。登录失败TT</text>
+<view style="vertical-align: middle; text-align: center;">
+<button wx:if="{{!canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class="center"> 点击登录 </button>
+<view wx:else> <text>{{info}}。。。登录失败TT</text> </view>
 </view>

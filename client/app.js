@@ -35,10 +35,9 @@ App({
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
-
+  
     // User login
-    req.weixinUserLogin(this)
-    req.backendLogin(this)
+    wx.clearStorageSync("thirdSessionKey")
 
   },
   globalData: {
