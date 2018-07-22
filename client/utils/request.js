@@ -2,7 +2,7 @@ var baseUrl = "";
 
 const util = require('util.js');
 
-function loginCallback(data, func) {
+function loginCallback(data, func, ...parm) {
   util.info("enter loginCallback")
   /*
   if (res.data.openGId) {
@@ -25,7 +25,7 @@ function loginCallback(data, func) {
     wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
     util.debug(wx.getStorageSync('thirdSessionKey'))
     getApp().loginReady = true;
-    if(func) func()
+    if(func) func(parm)
   } else if (data.status == "SERVER_NO_USER") {
     // 3. not registered => verify page => enter verify key / ask user to open in certain group chat
     wx.reLaunch({
@@ -34,7 +34,8 @@ function loginCallback(data, func) {
   }
 }
 
-function postRequest(_urlalias, sendData, func, parm) {
+function postRequest(_urlalias, sendData, func, callback, ...parm) {
+  util.debug("enter postRequest", _urlalias)
   wx.request({
     url: baseUrl + _urlalias,
     data: sendData,
@@ -45,7 +46,7 @@ function postRequest(_urlalias, sendData, func, parm) {
     method: 'POST',
     success: function (res) {
       util.debug(res.data)
-      func(res.data, parm);
+      func(res.data, callback, parm);
 
       /*
       wx.showToast({
@@ -88,18 +89,19 @@ function getRequest(_urlalias, func, parm = null) {
   })
 }
 
-const backendLogin = func => {
+const backendLogin = (func, ...parm) => {
     // 发送 res.code 到后台换取 openId, sessionKey, unionId
     var sendData = wx.getStorageSync('sessionData')
     util.debug("backendLogin: ", sendData)
-    postRequest("/session", sendData, loginCallback, func)
+    postRequest("/session", sendData, loginCallback, func, parm)
 }
 
-const weixinUserLogin = (obj, func) => {
-    util.debug("enter weixinUserLogin")
+const weixinUserLogin = (obj, backend = true, func, ...parm) => {
+    util.debug("enter weixinUserLogin, backend = ", backend)
 
     // 检查是否已经登录
-    if (obj.loginReady) {
+    if (backend && obj.loginReady) {
+      util.debug("login direct return")
       func();
       return
     }
@@ -107,7 +109,7 @@ const weixinUserLogin = (obj, func) => {
     // 登录
     wx.login({
       success: res => {
-        util.debug(res);
+        util.debug("login: ", res);
         obj.globalData.code = res.code;
       }
     })
@@ -138,8 +140,13 @@ const weixinUserLogin = (obj, func) => {
               sendData['groupIv'] = obj.globalData.groupInfo.iv;
               wx.setStorageSync('sessionData', sendData)
 
-              // Connect server for session establish
-              backendLogin(func)
+              if (backend) {
+                // Connect server for session establish
+                backendLogin(func, parm)
+              } else {
+                // No backend connection
+                func(parm)
+              }
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
               if (obj.userInfoReadyCallback) {

@@ -99,11 +99,13 @@ Page({
   },
 
   verifyLoginCallback: function(data, parm) {
+    util.info("enter verifyLoginCallback")
     util.debug(data.status)
     wx.hideLoading()
     if (!data.status) {
       util.TempMessage(this, "connectionError");
     } else if (data.status == "GENERAL_OK") {
+      app.loginReady = true;
       wx.showToast({
         title: "梅林你可来了",
       })
@@ -119,8 +121,19 @@ Page({
       util.TempMessage(this, "badpassword");
     } else if (data.status == "CLIENT_BAD_DATA") {
       // 重新登录
-      request.weixinUserLogin(app);
+      request.weixinUserLogin(app, true);
     }
+  },
+
+  verifyLogin: function (userpasswd) {
+    var sessionData = wx.getStorageSync('sessionData');
+    //var sendData = {};
+    //sendData['sessionData'] = sessionData;
+    //sendData['secretWord'] = userpasswd;
+    var sendData = sessionData;
+    sendData['secretWord'] = userpasswd;
+    //util.debug(sendData);
+    request.postRequest("/admin/verifyLogin", sendData, this.verifyLoginCallback, null);
   },
 
   formSubmit: function( event ) {
@@ -129,18 +142,12 @@ Page({
     //request.getRequest("/test/getSecretWord", this.passwordCallback, userpasswd)
     // post way
 
+    util.info("enter formSubmit")
     // login again, because the previous session code is out-dated for backend query
-    request.weixinUserLogin(app);
-    var sessionData = wx.getStorageSync('sessionData');
-    //var sendData = {};
-    //sendData['sessionData'] = sessionData;
-    //sendData['secretWord'] = userpasswd;
-    var sendData = sessionData;
-    sendData['secretWord'] = userpasswd;
-    util.debug(sendData);
+    // login again to get refreshed code -> use weixin auth info and password to send to backend for verification -> check result
+    request.weixinUserLogin(app, false, this.verifyLogin, userpasswd);
     wx.showLoading({
       title: '身份验证中...'
     })
-    request.postRequest("/admin/verifyLogin", sendData, this.verifyLoginCallback, null);
   }
 })

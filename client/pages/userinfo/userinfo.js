@@ -1,7 +1,7 @@
-// pages/prelogin/prelogin.js
-const req = require('../../utils/request.js')
-const util = require('../../utils/util.js')
+// pages/userinfo/userinfo.js
+
 const app = getApp()
+const util = require('../../utils/util.js')
 
 Page({
 
@@ -9,32 +9,18 @@ Page({
    * 页面的初始数据
    */
   data: {
-    canIUse: false,
-    info: null
+    voicepart: ["女高一", "女高二", "女中一", "女中二", "男高一", "男高二", "男低一", "男低二"],
+    voicepartIndex: 0,
+
+    status: ["成员", "暂离"],
+    statusIndex: 0
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    var msg;
-    switch(options['info']) {
-      case "user":
-        msg = "数据解析错误";
-        this.setData({
-          canIUse: false
-        })
-        break;
-      case "backend":
-        msg = "Oops, 服务器挂啦";
-        this.setData({
-          canIUse: true
-        })
-        break;
-    }
-    this.setData({
-      info: msg
-    })
+    util.onloadCheck(app, this)
   },
 
   /**
@@ -86,20 +72,18 @@ Page({
   
   },
 
-  getUserInfo: function (e) {
-    util.debug(e)
-    app.globalData.userInfo = e.detail.userInfo
-    // User login
-    wx.showLoading({
-      title: '登陆中',
+  /**
+   * Self-defined functions
+   */
+  bindVoicepartChange: function(e) {
+    this.setData({
+      voicepartIndex: e.detail.value
     })
-    req.weixinUserLogin(app, true, this.goodlogin)
   },
 
-  goodlogin: function () {
-    wx.hideLoading()
-    wx.reLaunch({
-      url: '/pages/home/home',
+  bindStatusChange: function(e) {
+    this.setData({
+      statusIndex: e.detail.value
     })
   }
 })

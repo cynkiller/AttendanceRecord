@@ -50,7 +50,7 @@ Page({
       withShareTicket: true //要求小程序返回分享目标信息
     })
 
-    req.weixinUserLogin(app, this.showpage)
+    req.weixinUserLogin(app, true, this.showpage)
 
 
     // 地理位置权限
@@ -90,9 +90,11 @@ Page({
   },
 
   showpage: function() {
+    util.info("showpage")
     this.setData({
       showpage: true
     })
+    this.onShow()
   },
 
   /**
@@ -109,7 +111,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    if(this.showpage) {
+    if(this.data.showpage) {
       this.onShowOperation();
       this.data.interval = setInterval(this.onShowOperation, 60000);
     }
@@ -169,7 +171,7 @@ Page({
    */
   onHide: function () {
     // 停止polling地理位置和时间
-    if(this.showpage)
+    if(this.data.showpage)
         clearInterval(this.data.interval);  
   },
 
