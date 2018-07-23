@@ -41,12 +41,14 @@ function postRequest(_urlalias, sendData, func, callback, ...parm) {
     data: sendData,
     header: {
       'content-type': 'application/x-www-form-urlencoded',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'thirdSessionKey': wx.getStorageSync("thirdSessionKey")
     },
     method: 'POST',
     success: function (res) {
       util.debug(res.data)
-      func(res.data, callback, parm);
+      if (func)
+        func(res.data, callback, parm);
 
       /*
       wx.showToast({

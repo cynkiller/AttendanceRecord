@@ -6,6 +6,7 @@ import backend.model.UserInfo;
 
 public interface UserInfoRepository extends MongoRepository<UserInfo, String> {
     List<UserInfo> findByOpenid(String openid);
+    UserInfo findFirstByOpenid(String openid);
     List<UserInfo> findAll();
     long countByOpenid(String openid);
     //UserInfo insert(UserInfo userInfo);

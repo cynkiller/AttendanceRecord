@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import backend.util.Utility;
 import backend.util.StaticInfo;
@@ -43,7 +44,10 @@ public class AdminController {
 	}
 
 	@RequestMapping("/admin/setSecretWord") // consider change to /admin/... for these information
-	public void setSecretWord(@RequestParam(value="secretWord") String secretWord) {
+	public void setSecretWord(
+		@RequestParam(value="secretWord") String secretWord,
+		@RequestHeader("thirdSessionKey") String sessionKey)
+	{
 		// TBD: add identification verify. High importance
 		authorizedInfoRepository.saveSecretWord(secretWord);
 	}
@@ -59,7 +63,7 @@ public class AdminController {
 		return secretWord;
 	}
 
-	@RequestMapping(name = "/admin/verifyLogin", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value = "/admin/verifyLogin", method = RequestMethod.POST, produces = "application/json")
 	public String verifyLogin(@ModelAttribute VerifyData data) {
 		String outString;
 		String userSecretWord = data.getSecretWord();

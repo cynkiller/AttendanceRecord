@@ -13,6 +13,17 @@ public class UserInfo {
         DEPART
     }
 
+    public enum VOICEPART {
+        FH1,
+        FH2,
+        FM1,
+        FM2,
+        MH1,
+        MH2,
+        ML1,
+        ML2
+    }
+
     public enum AUTH {
         MEMBER,
         ROOT,
@@ -46,7 +57,7 @@ public class UserInfo {
     private String openid;              // must
     private String nickName;            // must
     private String realName;
-    private String voicePart;
+    private VOICEPART voicePart;
     private String avatarUrl;           // must
     private List<String> groups;
     private STATE state;                // must

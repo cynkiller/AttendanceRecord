@@ -26,7 +26,7 @@ Page({
         })
         break;
       case "backend":
-        msg = "Oops, 服务器挂啦";
+        msg = "Oops, 连不上服务器";
         this.setData({
           canIUse: true
         })

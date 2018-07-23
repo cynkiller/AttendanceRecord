@@ -31,6 +31,7 @@ import backend.service.SessionService;
 import backend.service.UserInfoService;
 import backend.util.Debug;
 import backend.util.StaticInfo;
+import backend.util.Utility;
 
 @RestController
 @RequestMapping("/session")
@@ -83,8 +84,7 @@ public class SessionController {
         SessionData.ServerData serverData;
         serverData = loginService.getSessionData(data);
         if (serverData == null) {
-            outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_DATA);
-            return new JSONObject(outString).toString();
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_BAD_DATA);
         }
         sessionData.setServerData(serverData);
     
@@ -98,8 +98,7 @@ public class SessionController {
         String openid = serverData.getOpenid();
         if (!userInfoService.openidExists(openid)) {
             // User not exist in database
-            outString = String.format("{ status: %s}", StaticInfo.StatusCode.SERVER_NO_USER);
-            return new JSONObject(outString).toString();
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_NO_USER);
         }
         Debug.Log("Openid exists in the database. Verification passed.");
 
@@ -107,8 +106,7 @@ public class SessionController {
             /* Get user sensitive data and group info in case needed */
             JSONObject userSensitiveData = loginService.GetUserSensitiveData(sessionData);
             if (serverData == null) {
-                outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_DATA);
-                return new JSONObject(outString).toString();
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_BAD_DATA);
             }
 
             /* Get group info GId in case need */
@@ -120,8 +118,7 @@ public class SessionController {
                 if (groupId != null) {
                     sessionData.setOpenGId(groupId);
                 } else {
-                    outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_DATA);
-                    return new JSONObject(outString).toString();                
+                    return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_BAD_DATA);
                 }
             }
             //Debug.Log("sessionData: " + sessionData.toString());
@@ -129,7 +126,6 @@ public class SessionController {
         } else {
             thirdSessionKey = sessionService.getSession(openid);
         }
-        outString = String.format("{ status: %s, thirdSessionKey: %s}", StaticInfo.StatusCode.GENERAL_OK, thirdSessionKey);
-        return new JSONObject(outString).toString();
+        return Utility.retmsg("{ status: %s, thirdSessionKey: %s}", StaticInfo.StatusCode.GENERAL_OK, thirdSessionKey);
     }
 }

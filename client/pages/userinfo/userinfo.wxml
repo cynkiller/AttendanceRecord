@@ -40,7 +40,7 @@
                       <view class="weui-label">昵称</view>
                   </view>
                   <view class="weui-cell__bd">
-                      <input class="weui-input" placeholder="请输入昵称（可选）"/>
+                      <input class="weui-input" name="nickname" placeholder="请输入昵称（可选）"/>
                   </view>
               </view>
               <view class="weui-cell weui-cell_input">
@@ -48,7 +48,7 @@
                       <view class="weui-label">真实姓名</view>
                   </view>
                   <view class="weui-cell__bd">
-                      <input class="weui-input" placeholder="请输入真实姓名（可选）" />
+                      <input class="weui-input" name="realname" placeholder="请输入真实姓名（可选）" />
                   </view>
               </view>
               <view class="weui-cell weui-cell_select">
@@ -56,7 +56,7 @@
                       <view class="weui-label">声部</view>
                   </view>
                   <view class="weui-cell__bd">
-                      <picker bindchange="bindVoicepartChange" value="{{voicepartindex}}" range="{{voicepart}}">
+                      <picker bindchange="bindVoicepartChange" name="voicepart" value="{{voicepartindex}}" range="{{voicepart}}">
                           <view class="weui-select weui-select_in-select-after">{{voicepart[voicepartIndex]}}</view>
                       </picker>
                   </view>
@@ -66,7 +66,7 @@
                       <view class="weui-label">状态</view>
                   </view>
                   <view class="weui-cell__bd">
-                      <picker bindchange="bindStatusChange" value="{{statusindex}}" range="{{status}}">
+                      <picker bindchange="bindStatusChange" name="status" value="{{statusindex}}" range="{{status}}">
                           <view class="weui-select weui-select_in-select-after">{{status[statusIndex]}}</view>
                       </picker>
                   </view>

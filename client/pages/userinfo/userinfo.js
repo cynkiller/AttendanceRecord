@@ -2,6 +2,7 @@
 
 const app = getApp()
 const util = require('../../utils/util.js')
+const request = require('../../utils/request.js')
 
 Page({
 
@@ -34,7 +35,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-  
+      // TBD: Get current data from backend
   },
 
   /**
@@ -85,5 +86,16 @@ Page({
     this.setData({
       statusIndex: e.detail.value
     })
+  },
+
+  formSubmit: function(event) {
+    util.debug(event.detail.value)
+    var sendData = {}
+    sendData['nickname'] = event.detail.value.nickname; // backend check 
+    sendData['realname'] = event.detail.value.realname; // backend check
+    sendData['voicepart'] = this.data.voicepartIndex;
+    sendData['status'] = this.data.statusIndex;
+    request.postRequest("/setUserinfo", sendData);
+    // TBD: callback function for result checking
   }
 })

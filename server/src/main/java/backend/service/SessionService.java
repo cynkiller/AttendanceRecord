@@ -73,6 +73,18 @@ public class SessionService {
         return false;
     }
 
+    public String getValidOpenid(String sessionKey) {
+        String openid;
+        if (idKeyMap.get(sessionKey) != null) {
+            openid = idKeyMap.get(sessionKey);
+            if(sessionValid(openid)) {
+                // Consider auto extend expire time here?
+                return openid;
+            }
+        }
+        return null;
+    }
+
     public String getNewSession(String openid, SessionData sd) {
         Debug.Log("Current timestamp: " + Debug.getTimestamp());
         Debug.Log("Current time: " + Debug.getDatetime());

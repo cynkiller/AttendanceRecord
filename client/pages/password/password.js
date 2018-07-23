@@ -105,6 +105,7 @@ Page({
     if (!data.status) {
       util.TempMessage(this, "connectionError");
     } else if (data.status == "GENERAL_OK") {
+      wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
       app.loginReady = true;
       wx.showToast({
         title: "梅林你可来了",
