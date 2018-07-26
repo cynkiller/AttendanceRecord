@@ -3,6 +3,7 @@
 const app = getApp()
 const util = require('../../utils/util.js')
 const rehearsal = require('../../utils/rehearsal.js')
+const request = require('../../utils/request.js')
 
 Page({
 
@@ -296,5 +297,13 @@ Page({
     this.setData({
       strategyIndex: idx
     })
+  },
+
+  setNewSecretWord: function( event ) {
+    util.debug(event.detail.value.newpasswd)
+    var sendData = {}
+    sendData['secretWord'] = event.detail.value.newpasswd;
+    request.postRequest("/admin/setSecretWord", sendData);
+    // TBD: callback func
   }
 })

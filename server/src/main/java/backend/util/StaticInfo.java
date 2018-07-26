@@ -8,6 +8,7 @@ public class StaticInfo {
         GENERAL_BAD,
         CLIENT_BAD_DATA,
         CLIENT_BAD_SECRETWORD,
+        CLIENT_NOT_AUTHORIZED,
         SERVER_NO_USER,
         SERVER_NO_SECRETWORD,
         SERVER_INSERT_NEWUSER_FAILED,

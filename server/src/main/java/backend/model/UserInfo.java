@@ -26,9 +26,8 @@ public class UserInfo {
 
     public enum AUTH {
         MEMBER,
-        ROOT,
-        SUPERADMIN,
-        ADMIN
+        ADMIN,
+        SUPERADMIN
     }
 
     public enum ATTEND {

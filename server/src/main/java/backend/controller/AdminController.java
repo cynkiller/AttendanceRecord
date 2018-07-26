@@ -20,6 +20,7 @@ import backend.service.LoginService;
 import backend.service.SessionService;
 import backend.model.VerifyData;
 import backend.model.SessionData;
+import backend.model.UserInfo;
 
 @RestController
 public class AdminController {
@@ -43,13 +44,23 @@ public class AdminController {
 		return distance;
 	}
 
-	@RequestMapping("/admin/setSecretWord") // consider change to /admin/... for these information
-	public void setSecretWord(
+	@RequestMapping(value = "/admin/setSecretWord", method = RequestMethod.POST, produces = "application/json") // consider change to /admin/... for these information
+	public String setSecretWord(
 		@RequestParam(value="secretWord") String secretWord,
 		@RequestHeader("thirdSessionKey") String sessionKey)
 	{
-		// TBD: add identification verify. High importance
+		String openid = sessionService.getValidOpenid(sessionKey);
+        if (openid == null) {
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+		}
+		UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+		UserInfo.AUTH auth = userinfo.getAuthority();
+		if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
+		}
+		// Actually update secretWord
 		authorizedInfoRepository.saveSecretWord(secretWord);
+		return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);
 	}
 
 	// TEST USE ONLY. Disable this interface in production for security consideration
