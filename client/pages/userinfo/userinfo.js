@@ -95,7 +95,45 @@ Page({
     sendData['realname'] = event.detail.value.realname; // backend check
     sendData['voicepart'] = this.data.voicepartIndex;
     sendData['status'] = this.data.statusIndex;
-    request.postRequest("/setUserinfo", sendData);
-    // TBD: callback function for result checking
+    request.postRequest("/setUserinfo", sendData, this.formSubmitCallback, null, this);
+  },
+
+  formSubmitCallback: function(data, func, obj) {
+    util.info("enter userinfo formSubmitCallback")
+    console.log(func, obj)
+    if (!data.status) {
+      util.info("Remote backend problem. Failed to change userinfo.")
+      obj.setData( {
+        updatefail: true,
+        failmsg: "无法连接服务器。。更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        }, obj)
+      }, 3000)
+    } else if (data.status == "SERVER_SESSION_EXPIRED") {
+      util.info("Login session expired.")
+      console.log(obj)
+      app.loginReady = false;
+      obj.setData({
+        updatefail: true,
+        failmsg: "重新登陆中。。"
+      })
+      // relogin
+      request.weixinUserLogin(app, true, function(obj){
+          obj.setData({updatefail: false})
+        }, obj)
+    } else if (data.status == "GENERAL_OK") {
+      util.info("Update successful.")
+      wx.showToast({
+        title: '更新成功',
+      })
+      setTimeout( function() {
+        wx.switchTab({
+          url: '/pages/index/index',
+        })
+      }, 3000);
+    }
   }
 })

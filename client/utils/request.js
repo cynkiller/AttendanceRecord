@@ -2,8 +2,9 @@ var baseUrl = "";
 
 const util = require('util.js');
 
-function loginCallback(data, func, ...parm) {
+function loginCallback(data, func, parm) {
   util.info("enter loginCallback")
+  const app = getApp();
   /*
   if (res.data.openGId) {
     obj.globalData.groupInfo.openGId = res.data.openGId;
@@ -17,6 +18,7 @@ function loginCallback(data, func, ...parm) {
   } else if(data.status == "CLIENT_BAD_DATA") {
     // 1. bad code => weixin backend problem
     util.info("Failed to get user information.")
+    app.loginReady = false;
     wx.reLaunch({
       url: '/pages/prelogin/prelogin?info=user',
     })
@@ -24,17 +26,18 @@ function loginCallback(data, func, ...parm) {
     // 2. good status, get 3rd session id
     wx.setStorageSync('thirdSessionKey', data.thirdSessionKey)
     util.debug(wx.getStorageSync('thirdSessionKey'))
-    getApp().loginReady = true;
+    app.loginReady = true;
     if(func) func(parm)
   } else if (data.status == "SERVER_NO_USER") {
     // 3. not registered => verify page => enter verify key / ask user to open in certain group chat
+    app.loginReady = false;
     wx.reLaunch({
       url: '/pages/password/password',
     })
   }
 }
 
-function postRequest(_urlalias, sendData, func, callback, ...parm) {
+function postRequest(_urlalias, sendData, func, callback, parm) {
   util.debug("enter postRequest", _urlalias)
   wx.request({
     url: baseUrl + _urlalias,
@@ -91,28 +94,31 @@ function getRequest(_urlalias, func, parm = null) {
   })
 }
 
-const backendLogin = (func, ...parm) => {
+const backendLogin = (func, parm) => {
     // 发送 res.code 到后台换取 openId, sessionKey, unionId
     var sendData = wx.getStorageSync('sessionData')
     util.debug("backendLogin: ", sendData)
     postRequest("/session", sendData, loginCallback, func, parm)
 }
 
-const weixinUserLogin = (obj, backend = true, func, ...parm) => {
+const weixinUserLogin = (obj, backend = true, func, parm) => {
     util.debug("enter weixinUserLogin, backend = ", backend)
 
     // 检查是否已经登录
     if (backend && obj.loginReady) {
       util.debug("login direct return")
-      func();
+      func(parm);
       return
     }
   
     // 登录
     wx.login({
       success: res => {
-        util.debug("login: ", res);
+        util.debug("login success: ", res);
         obj.globalData.code = res.code;
+      },
+      fail: res => {
+        util.debug("login fail: ", res)
       }
     })
 

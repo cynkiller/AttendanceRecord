@@ -54,8 +54,8 @@ public class UserInfoController {
         //UserInfo info = userInfoService.getUserInfoByOpenid(openid);
 
         // check optional param
-        if (nickname != null) info.put("nickName", nickname);
-        if (realname != null) info.put("realName", realname);
+        if (!nickname.isEmpty()) info.put("nickName", nickname);
+        if (!realname.isEmpty()) info.put("realName", realname);
         info.put("voicePart", UserInfo.VOICEPART.values()[voicepart]);
         info.put("state", UserInfo.STATE.values()[status]);
 
