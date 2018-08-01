@@ -129,6 +129,7 @@ Page({
         }, obj)
     } else if (data.status == "GENERAL_OK") {
       util.info("Update successful.")
+      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setDefaultData);
       wx.showToast({
         title: '更新成功',
       })
