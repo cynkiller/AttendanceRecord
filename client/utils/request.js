@@ -77,7 +77,8 @@ function getRequest(_urlalias, func, parm = null) {
     url: baseUrl + _urlalias,
     header: {
       'content-type': 'application/json',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'thirdSessionKey': wx.getStorageSync("thirdSessionKey")
     },
     method: "GET",
     success: function (res) {

@@ -24,13 +24,19 @@ public class UserInfoController {
     @Autowired
     private SessionService sessionService;
 
-    @RequestMapping(value = "/queryUserInfo", method = RequestMethod.POST, produces = "application/json")
-    public List<UserInfo> queryUserInfo(@RequestParam(value="user", defaultValue="") String name) {
-        if (! name.isEmpty()) {
-            return null;
-        } else {
-            return null;
+    @RequestMapping(value = "/queryUserInfo", method = RequestMethod.GET, produces = "application/json")
+    public String queryUserInfo(
+        @RequestHeader("thirdSessionKey") String sessionKey) {
+        Debug.Log("Enter queryUserInfo");
+        Debug.Log(sessionKey);
+        // Check if session is valid, Get openid from session
+        String openid = sessionService.getValidOpenid(sessionKey);
+        if (openid == null) {
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
         }
+
+        UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+        return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, userinfo.toString());
     }
 
     @RequestMapping(value = "/setUserinfo", method = RequestMethod.POST, produces = "application/json")

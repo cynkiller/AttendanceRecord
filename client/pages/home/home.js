@@ -113,7 +113,9 @@ Page({
   onShow: function () {
     if(this.data.showpage) {
       this.onShowOperation();
-      this.data.interval = setInterval(this.onShowOperation, 60000);
+      if(this.data.interval !== undefined) {
+        this.data.interval = setInterval(this.onShowOperation, 60000);
+      }
     }
   },
 
@@ -171,8 +173,10 @@ Page({
    */
   onHide: function () {
     // 停止polling地理位置和时间
-    if(this.data.showpage)
+    if(this.data.showpage) {
+        util.debug("clearIntervfal", this.data.interval)
         clearInterval(this.data.interval);  
+    }
   },
 
   /**

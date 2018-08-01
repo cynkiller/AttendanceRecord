@@ -42,7 +42,11 @@
                       <view class="weui-label">昵称</view>
                   </view>
                   <view class="weui-cell__bd">
-                      <input class="weui-input" name="nickname" placeholder="请输入昵称（可选）"/>
+                      <view wx:if="{{nickName}}">
+                          <input class="weui-input" name="nickname" placeholder="{{nickName}}"/>
+                      </view><view wx:else>
+                          <input class="weui-input" name="nickname" placeholder="请输入昵称（可选）"/>
+                      </view>
                   </view>
               </view>
               <view class="weui-cell weui-cell_input">
@@ -50,7 +54,11 @@
                       <view class="weui-label">真实姓名</view>
                   </view>
                   <view class="weui-cell__bd">
-                      <input class="weui-input" name="realname" placeholder="请输入真实姓名（可选）" />
+                      <view wx:if="{{realName}}">
+                          <input class="weui-input" name="realname" placeholder="{{realName}}"/>
+                      </view><view wx:else>
+                          <input class="weui-input" name="realname" placeholder="请输入真实姓名（可选）"/>
+                      </view>
                   </view>
               </view>
               <view class="weui-cell weui-cell_select">

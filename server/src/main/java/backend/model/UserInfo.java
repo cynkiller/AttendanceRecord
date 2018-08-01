@@ -74,4 +74,11 @@ public class UserInfo {
         this.point = StaticInfo.DEFAULT_POINT;
         this.authority = StaticInfo.DEFAULT_AUTH;
     }
+
+    @Override
+    public String toString() {
+        String format = "{nickName: %s, realName: %s, state: %d, point: %d, authority: %d, voicePart: %d}";
+        String info = String.format(format, this.nickName, this.realName, this.state.ordinal(), this.point, this.authority.ordinal(), this.voicePart.ordinal());
+        return info;
+    }
 }
