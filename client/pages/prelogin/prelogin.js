@@ -26,11 +26,16 @@ Page({
         })
         break;
       case "backend":
-        msg = "Oops, 连不上服务器";
+        msg = "Oops, 连不上后端服务器";
         this.setData({
           canIUse: true
         })
         break;
+      case "weixin":
+        msg = "Oops, 连不上微信服务器"
+        this.setData({
+          canIUse: false
+        })
     }
     this.setData({
       info: msg

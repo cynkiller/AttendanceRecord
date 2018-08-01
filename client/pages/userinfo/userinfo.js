@@ -29,8 +29,11 @@ Page({
    */
   onReady: function () {
     // Current value
-    var sendData = {}
-    request.getRequest("/queryUserInfo", this.setDefaultInfo, this);
+    if (app.backendUser) {
+      this.setDefaultData(this, app.backendUser)
+    } else {
+      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setDefaultData);
+    }
   },
 
   /**
@@ -136,41 +139,14 @@ Page({
       }, 3000);
     }
   },
-
-  setDefaultInfo: function(data, obj) {
-    util.info("enter userinfo setDefaultInfo")
-    if (!data.status) {
-      util.info("Remote backend problem. Failed to change userinfo.")
-      obj.setData({
-        updatefail: true,
-        failmsg: "无法连接服务器。。更新失败"
-      })
-      setTimeout(function (obj) {
-        obj.setData({
-          updatefail: false
-        }, obj)
-      }, 3000)
-    } else if (data.status == "SERVER_SESSION_EXPIRED") {
-      util.info("Login session expired.")
-      console.log(obj)
-      app.loginReady = false;
-      obj.setData({
-        updatefail: true,
-        failmsg: "重新登陆中。。"
-      })
-      // relogin
-      request.weixinUserLogin(app, true, function (obj) {
-        obj.setData({ updatefail: false })
-      }, obj)
-    } else if (data.status == "GENERAL_OK") {
-      util.info("Get userinfo success.")
-      obj.setData({
-        nickName: data.data.nickName,
-        realName: data.data.realName,
-        voicepartIndex: data.data.voicePart,
-        stateIndex: data.data.state
-      })
-      util.debug(data)
-    }    
+  setDefaultData: function(obj, data) {
+    if (data.hasOwnProperty("data")) data = data.data;
+    obj.setData({
+      nickName: data.nickName,
+      realName: data.realName,
+      voicepartIndex: data.voicePart,
+      stateIndex: data.state,
+      point: data.point
+    })
   }
 })

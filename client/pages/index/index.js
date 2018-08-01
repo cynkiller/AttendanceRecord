@@ -2,6 +2,7 @@
 
 //获取应用实例
 const app = getApp()
+const request = require('../../utils/request.js')
 
 // 申请mapsdk还要绑定qq号一刚！
 //var QQMapWX = require('../../libs/qqmap-wx-jssdk.js');
@@ -10,9 +11,7 @@ const util = require('../../utils/util.js')
 
 Page({
   data: {
-    canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    administrator: true,
-    superuser: true
+    canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
   //事件处理函数
   bindViewTap: function() {
@@ -27,8 +26,23 @@ Page({
       withShareTicket: true //要求小程序返回分享目标信息
     })
     this.setData({
-      opengid: app.globalData.groupInfo.openGId,
-      point: 30
+      opengid: app.globalData.groupInfo.openGId
+    })
+  },
+  onShow: function() {
+    if (app.backendUser) {
+      this.setUserInfo(this, app.backendUser)
+    } else {
+      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
+    }
+  },
+  setUserInfo: function(obj, data) {
+    util.info("enter setUserInfo")
+    if (data.hasOwnProperty("data")) data = data.data;
+    obj.setData({
+      point: data.point,
+      nickName: data.nickName,
+      authority: data.authority
     })
   },
   getUserInfo: function(e) {
@@ -71,5 +85,8 @@ Page({
         }
       }
     });
+  },
+  onPullDownRefresh : function() {
+    request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
   }
 })

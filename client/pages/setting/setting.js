@@ -81,7 +81,19 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-  
+    if (app.backendUser) {
+      this.setUserInfo(this, app.backendUser)
+    } else {
+      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
+    }  
+  },
+
+  setUserInfo: function (obj, data) {
+    util.info("enter setUserInfo")
+    if (data.hasOwnProperty("data")) data = data.data;
+    obj.setData({
+      authority: data.authority
+    })
   },
 
   /**
@@ -102,7 +114,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-  
+    request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
   },
 
   /**

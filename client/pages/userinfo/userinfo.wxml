@@ -18,7 +18,10 @@
                     <view class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</view> -->
                 </view>
                 <view class="weui-cell__bd">
-                    <block wx:if="{{userInfo.nickName}}">
+                    <block wx:if="{{nickName}}">
+                      <view>{{nickName}}</view>
+                    </block>
+                    <block wx:elif="{{userInfo.nickName}}">
                       <view>{{userInfo.nickName}}</view>
                     </block>
                     <block wx:else>
