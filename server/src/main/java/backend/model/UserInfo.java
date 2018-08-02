@@ -24,6 +24,13 @@ public class UserInfo {
         ML2
     }
 
+    public enum LEADER {
+        FH,
+        FM,
+        MH,
+        ML
+    }
+
     public enum AUTH {
         MEMBER,
         ADMIN,
@@ -62,6 +69,7 @@ public class UserInfo {
     private STATE state;                // must
     private int point;                  // must
     private AUTH authority;             // must
+    private LEADER leader;              // administrator set?
     private List<RehearsalRecord> record;
     private List<Message> message;
 

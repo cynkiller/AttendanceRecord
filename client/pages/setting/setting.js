@@ -153,8 +153,11 @@ Page({
         address['address'] = res.address;
         address['latitude'] = res.latitude;
         address['longitude'] = res.longitude;
-        address['checked'] = false;
 
+        // Update backend database， TBD callback function
+        request.postRequest("/admin/addNewAddress", address);
+
+        address['checked'] = false;
         app.rehearsalInfo.addressBook.push(address);
         util.debug(app.rehearsalInfo.addressBook)
         that.setData({

@@ -18,9 +18,11 @@ import backend.repo.AuthorizedInfoRepository;
 import backend.service.UserInfoService;
 import backend.service.LoginService;
 import backend.service.SessionService;
+import backend.service.AddressService;
 import backend.model.VerifyData;
 import backend.model.SessionData;
 import backend.model.UserInfo;
+import backend.model.Address;
 
 @RestController
 public class AdminController {
@@ -36,6 +38,9 @@ public class AdminController {
 		
     @Autowired
     private SessionService sessionService;
+
+	@Autowired
+	private AddressService addressService;
 
 	@RequestMapping("/test/distance")
 	public double queryPerson() {
@@ -135,5 +140,33 @@ public class AdminController {
             outString = String.format("{ status: %s}", StaticInfo.StatusCode.CLIENT_BAD_SECRETWORD);
             return new JSONObject(outString).toString();
 		}
+	}
+
+	/**
+	 * Add Rehearsal address
+	 */
+	@RequestMapping(value = "/admin/addNewAddress", method = RequestMethod.POST, produces = "application/json") // consider change to /admin/... for these information
+	public String addNewAddress(
+		//@ModelAttribute Address address,
+		@RequestParam(value="name") String location,
+		@RequestParam(value="address") String address,
+		@RequestParam(value="longitude") double longitude,
+		@RequestParam(value="latitude") double latitude,
+		@RequestHeader("thirdSessionKey") String sessionKey)
+	{
+		String openid = sessionService.getValidOpenid(sessionKey);
+        if (openid == null) {
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+		}
+		UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+		UserInfo.AUTH auth = userinfo.getAuthority();
+		if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
+		}
+		// Actually update secretWord
+		if (addressService.saveNewAddress(location, address, longitude, latitude)) {
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_ADDRESS_EXIST);
+		}
+		return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);
 	}
 }
