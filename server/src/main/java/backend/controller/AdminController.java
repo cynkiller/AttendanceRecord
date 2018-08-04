@@ -148,25 +148,92 @@ public class AdminController {
 	@RequestMapping(value = "/admin/addNewAddress", method = RequestMethod.POST, produces = "application/json") // consider change to /admin/... for these information
 	public String addNewAddress(
 		//@ModelAttribute Address address,
-		@RequestParam(value="name") String location,
+		@RequestParam(value="location") String location,
 		@RequestParam(value="address") String address,
 		@RequestParam(value="longitude") double longitude,
 		@RequestParam(value="latitude") double latitude,
 		@RequestHeader("thirdSessionKey") String sessionKey)
 	{
-		String openid = sessionService.getValidOpenid(sessionKey);
-        if (openid == null) {
-            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+		try {
+			String openid = sessionService.getValidOpenid(sessionKey);
+			if (openid == null) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+			}
+			UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+			UserInfo.AUTH auth = userinfo.getAuthority();
+			if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
+			}
+
+			if (addressService.saveNewAddress(location, address, longitude, latitude)) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_ADDRESS_EXIST);
+			}
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);
+		} catch ( Exception e ) {
+			Debug.Log(e.toString());
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
 		}
-		UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
-		UserInfo.AUTH auth = userinfo.getAuthority();
-		if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
-			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
+	}
+
+	/**
+	 * Remove Rehearsal address
+	 */
+	@RequestMapping(value = "/admin/removeNewAddress", method = RequestMethod.POST, produces = "application/json") // consider change to /admin/... for these information
+	public String removeNewAddress(
+		//@ModelAttribute Address address,
+		@RequestParam(value="longitude") double longitude,
+		@RequestParam(value="latitude") double latitude,
+		@RequestHeader("thirdSessionKey") String sessionKey)
+	{
+		try {
+			String openid = sessionService.getValidOpenid(sessionKey);
+			if (openid == null) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+			}
+			UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+			UserInfo.AUTH auth = userinfo.getAuthority();
+			if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
+			}
+
+			int records = addressService.removeAddress(longitude, latitude);
+			if (records == 0) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_ADDRESS_NOT_EXIST);
+			}
+			Debug.Log(String.format("Removed %d records.", records));
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);
+		} catch ( Exception e ) {
+			Debug.Log(e.toString());
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
 		}
-		// Actually update secretWord
-		if (addressService.saveNewAddress(location, address, longitude, latitude)) {
-			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_ADDRESS_EXIST);
+	}
+
+	/**
+	 * Query Rehearsal address
+	 */
+	@RequestMapping(value = "/admin/queryAddress", method = RequestMethod.GET, produces = "application/json") // consider change to /admin/... for these information
+	public String queryAddress(
+		@RequestHeader("thirdSessionKey") String sessionKey)
+	{
+		try {
+			String openid = sessionService.getValidOpenid(sessionKey);
+			if (openid == null) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+			}
+			UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+			UserInfo.AUTH auth = userinfo.getAuthority();
+			if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
+				return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
+			}
+
+			List<Address> addr = addressService.queryAddress();
+			if (addr == null) {
+				Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, "null");
+			}
+			return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, addr.toString());
+		} catch ( Exception e ) {
+			Debug.Log(e.toString());
+			return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
 		}
-		return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);
 	}
 }

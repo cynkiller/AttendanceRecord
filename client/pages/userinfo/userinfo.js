@@ -32,7 +32,7 @@ Page({
     if (app.backendUser) {
       this.setDefaultData(this, app.backendUser)
     } else {
-      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setDefaultData);
+      request.getRequest("/queryUserInfo", request.getUserInfo, this.setDefaultData, this);
     }
   },
 
@@ -129,7 +129,7 @@ Page({
         }, obj)
     } else if (data.status == "GENERAL_OK") {
       util.info("Update successful.")
-      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setDefaultData);
+      request.getRequest("/queryUserInfo", request.getUserInfo, this.setDefaultData, this);
       wx.showToast({
         title: '更新成功',
       })

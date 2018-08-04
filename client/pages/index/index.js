@@ -33,7 +33,7 @@ Page({
     if (app.backendUser) {
       this.setUserInfo(this, app.backendUser)
     } else {
-      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
+      request.getRequest("/queryUserInfo", request.getUserInfo, this.setUserInfo, this);
     }
   },
   setUserInfo: function(obj, data) {
@@ -87,6 +87,6 @@ Page({
     });
   },
   onPullDownRefresh : function() {
-    request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
+    request.getRequest("/queryUserInfo", request.getUserInfo, this.setUserInfo, this);
   }
 })

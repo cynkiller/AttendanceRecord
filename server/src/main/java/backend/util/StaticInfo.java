@@ -13,7 +13,9 @@ public class StaticInfo {
         SERVER_NO_SECRETWORD,
         SERVER_INSERT_NEWUSER_FAILED,
         SERVER_SESSION_EXPIRED,
-        SERVER_ADDRESS_EXIST
+        SERVER_ADDRESS_EXIST,
+        SERVER_ADDRESS_NOT_EXIST,
+        SERVER_INTERNAL_ERROR
     }
     public static String FORMAT_STATUS = "{ status: %s }";
     public static int DEFAULT_POINT = 30;

@@ -12,4 +12,9 @@ public class Address {
     private String address;
     private double longtitude;
     private double latitude;
+
+    @Override
+    public String toString() {
+        return String.format("{ location: %s, address: %s, longtitude: %f, latitude: %f }", this.location, this.address, this.longtitude, this.latitude);
+    }
 }

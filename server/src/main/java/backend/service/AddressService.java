@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.domain.Sort;
 
 import backend.repo.AddressRepository;
 import backend.util.Debug;
@@ -21,8 +22,20 @@ public class AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
+
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    private Long getLargestAddressId() {
+        Query query = new Query();
+        query.with(new Sort(Sort.Direction.DESC, "id"));
+        query.fields().include("id");
+        Address addr = mongoTemplate.findOne(query, Address.class);
+        if (addr != null)
+            return addr.getId();
+        else
+            return null;
+    }
 
     public Boolean saveNewAddress(String _loc, String _addr, double _long, double _lati) {
         // Check if address already exist
@@ -39,12 +52,9 @@ public class AddressService {
         if (addressRepository.countByLongtitude(addr.getLongtitude()) > 0 && addressRepository.countByLatitude(addr.getLatitude()) > 0 )
             return true;
         // Get autoincrement id
-        Address lastaddr = addressRepository.findOneByOrderByIdDesc();
-        Long lastid;
-        if (lastaddr == null) {
+        Long lastid = getLargestAddressId();
+        if (lastid == null) {
             lastid = 0l;
-        } else {
-            lastid = lastaddr.getId();
         }
         Debug.Log(String.format("AddressService: %s", lastid.toString()));
         addr.setId(lastid + 1);
@@ -54,5 +64,14 @@ public class AddressService {
 
     public Address getAddressById(Long _id) {
         return addressRepository.findFirstById(_id);
+    }
+
+    public int removeAddress(double _long, double _lati) {
+        List<Address> removedAddr = addressRepository.removeByLongtitudeAndLatitude(_long, _lati);
+        return removedAddr.size();
+    }
+
+    public List<Address> queryAddress() {
+        return addressRepository.findAllByOrderByIdDesc();
     }
 }

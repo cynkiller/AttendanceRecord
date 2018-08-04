@@ -47,7 +47,8 @@ Page({
         checked: false
       }
     ],
-    strategies: []
+    strategies: [],
+    addressBook: {}
   },
 
   /**
@@ -60,13 +61,94 @@ Page({
     for (var i = 0; i < 60; i++) {
       strtgs.push(i - 30)
     }
+
+    request.getRequest("/admin/queryAddress", this.addressCallback, this.queryAddressCallback, this);
+
     this.setData({
       rehearsalDate: app.rehearsalInfo.rehearsalDate,
       readableDate: util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
       rehearsalLocation: app.rehearsalInfo.rehearsalLocation,
-      addressBook: app.rehearsalInfo.addressBook,
       strategies: strtgs,
       strategyIndex: 30
+    })
+  },
+
+  addressCallback: function(data, callback, obj) {
+    util.info("enter addressCallback")
+    if (!data.status) {
+      util.info("Remote backend problem. Failed to change userinfo.")
+      obj.setData({
+        updatefail: true,
+        failmsg: "无法连接服务器。。更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        }, obj)
+      }, 3000)
+    } else if (data.status == "SERVER_SESSION_EXPIRED") {
+      util.info("Login session expired.")
+      app.loginReady = false;
+      obj.setData({
+        updatefail: true,
+        failmsg: "重新登陆中。。"
+      })
+      // relogin
+      request.weixinUserLogin(app, true, function (obj) {
+        obj.setData({ updatefail: false })
+      }, obj)
+    } else if (data.status == "CLIENT_NOT_AUTHORIZED") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "Oops。。没有权限哦>-<"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        }, obj)
+      }, 3000)
+    } else if (data.status == "SERVER_ADDRESS_EXIST") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "地址已存在。。不用再加啦"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        }, obj)
+      }, 3000)
+    } else if (data.status == "SERVER_ADDRESS_NOT_EXIST") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "地址不存在。。"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        }, obj)
+      }, 3000)
+    } else if (data.status == "SERVER_INTERNAL_ERROR") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "程序出了个bug！0.0"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        }, obj)
+      }, 3000)
+    } else if (data.status == "GENERAL_OK") {
+      util.info("Update successful.")
+      if (callback) callback(data, obj)
+    }
+  },
+
+  queryAddressCallback: function(data, obj) {
+    util.debug(data.data)
+    util.info("enter queryAddressCallback")
+    if (data.hasOwnProperty("data")) data = data.data;
+    obj.setData({
+      addressBook: data
     })
   },
 
@@ -84,8 +166,8 @@ Page({
     if (app.backendUser) {
       this.setUserInfo(this, app.backendUser)
     } else {
-      request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
-    }  
+      request.getRequest("/queryUserInfo", request.getUserInfo, this.setUserInfo, this);
+    }
   },
 
   setUserInfo: function (obj, data) {
@@ -114,7 +196,8 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-    request.getRequest("/queryUserInfo", request.getUserInfo, this, this.setUserInfo);
+    request.getRequest("/queryUserInfo", request.getUserInfo, this.setUserInfo, this);
+    request.getRequest("/admin/queryAddress", this.addressCallback, this.queryAddressCallback, this);
   },
 
   /**
@@ -149,29 +232,13 @@ Page({
         util.debug(res.longitude)
 
         var address = {};
-        address['name'] = res.name;
+        address['location'] = res.name;
         address['address'] = res.address;
         address['latitude'] = res.latitude;
         address['longitude'] = res.longitude;
 
         // Update backend database， TBD callback function
-        request.postRequest("/admin/addNewAddress", address);
-
-        address['checked'] = false;
-        app.rehearsalInfo.addressBook.push(address);
-        util.debug(app.rehearsalInfo.addressBook)
-        that.setData({
-          addressBook: app.rehearsalInfo.addressBook
-        })
-        // TBD: Update to backend
-        /* should be moved to update address
-        that.setData({
-          rehearsalLocation: res.name + ' ' + res.address
-        })
-        app.rehearsalInfo.rehearsalLocation = res.name + ' ' + res.address;
-        app.rehearsalInfo.latitude = res.latitude;
-        app.rehearsalInfo.longitude = res.longitude;
-        */
+        request.postRequest("/admin/addNewAddress", address, that.addressCallback, that.addAddressCallback, that);
       },
       fail: function () {
         // fail
@@ -179,6 +246,14 @@ Page({
       complete: function () {
         // complete
       }
+    })
+  },
+
+  addAddressCallback: function(data, obj) {
+    util.info("enter addAddressCallback")
+    request.getRequest("/admin/queryAddress", this.addressCallback, this.queryAddressCallback, this);
+    wx.showToast({
+      title: '添加地址成功',
     })
   },
 
@@ -210,11 +285,29 @@ Page({
 
     this.setData({
       addressBook: addressBook,
-      rehearsalLocation: addressBook[addressIdx].name + ' ' + addressBook[addressIdx].address
+      rehearsalLocation: addressBook[addressIdx].location + ' ' + addressBook[addressIdx].address
     });
-    app.rehearsalInfo.rehearsalLocation = addressBook[addressIdx].name + ' ' + addressBook[addressIdx].address;
+    app.rehearsalInfo.rehearsalLocation = addressBook[addressIdx].location + ' ' + addressBook[addressIdx].address;
     app.rehearsalInfo.latitude = addressBook[addressIdx].latitude;
     app.rehearsalInfo.longitude = addressBook[addressIdx].longitude;
+  },
+
+  removeAddress: function(event) {
+    util.debug("removeAddress index", event.target.dataset.index)
+    // TBD
+    var index = event.target.dataset.index;
+    var sendData = {}
+    sendData["longitude"] = this.data.addressBook[index].longtitude;
+    sendData["latitude"] = this.data.addressBook[index].latitude;
+    request.postRequest("/admin/removeNewAddress", sendData, this.addressCallback, this.removeAddressCallback, this);
+  },
+
+  removeAddressCallback: function(data, obj) {
+    util.info("enter userinfo removeAddressCallback")
+    request.getRequest("/admin/queryAddress", this.addressCallback, this.queryAddressCallback, this);
+    wx.showToast({
+      title: '删除地址成功',
+    })
   },
 
   /* 更新排练日期 */

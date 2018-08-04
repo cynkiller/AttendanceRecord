@@ -37,7 +37,7 @@ function loginCallback(data, func, parm) {
   }
 }
 
-function getUserInfo(data, obj, func) {
+function getUserInfo(data, func, obj) {
   util.info("enter userinfo setDefaultInfo")
   const app = getApp();
   if (!data.status) {
@@ -115,7 +115,7 @@ function postRequest(_urlalias, sendData, func, callback, parm) {
   })
 }
 
-function getRequest(_urlalias, func, parm = null, callback = null) {
+function getRequest(_urlalias, func, callback = null, parm = null) {
   wx.request({
     url: baseUrl + _urlalias,
     header: {
@@ -126,7 +126,7 @@ function getRequest(_urlalias, func, parm = null, callback = null) {
     method: "GET",
     success: function (res) {
       util.debug(res.data)
-      func(res.data, parm, callback)
+      func(res.data, callback, parm)
     },
     fail: function (res) {
       util.info("getRequest request failed.")
