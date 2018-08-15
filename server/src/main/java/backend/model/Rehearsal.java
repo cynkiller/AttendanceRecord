@@ -9,11 +9,13 @@ import lombok.Data;
 public class Rehearsal {
     public enum STATE {
         PASSED,
-        ONGOING
+        ONGOING,
+        CANCELLED
     }
 
     private long startTimestamp;
     private long endTimestamp;
+    private String date;        // xxxx-xx-xx
     private long addrId;
     private String event;
     private STATE state;

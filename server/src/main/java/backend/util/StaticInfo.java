@@ -21,4 +21,6 @@ public class StaticInfo {
     public static int DEFAULT_POINT = 30;
     public static UserInfo.STATE DEFAULT_STATE = UserInfo.STATE.MEMBER;
     public static UserInfo.AUTH DEFAULT_AUTH = UserInfo.AUTH.MEMBER;
+    public static Long DEFAULT_ADDR_ID = 3l; // TBD
+    public static String DEFAULT_EVENT = "Rehearsal";
 }
