@@ -15,6 +15,7 @@ public class StaticInfo {
         SERVER_SESSION_EXPIRED,
         SERVER_ADDRESS_EXIST,
         SERVER_ADDRESS_NOT_EXIST,
+        SERVER_REHEARSAL_UPDATE_FAIL,
         SERVER_INTERNAL_ERROR
     }
     public static String FORMAT_STATUS = "{ status: %s }";

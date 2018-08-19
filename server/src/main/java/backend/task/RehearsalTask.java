@@ -1,10 +1,5 @@
 package backend.task;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
-import java.sql.Timestamp; 
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -50,26 +45,9 @@ public class RehearsalTask implements Runnable {
         }
 
         // create new rehearsal entry
-        LocalDate ld = LocalDate.now();
-        ld = ld.with(TemporalAdjusters.next(DayOfWeek.SATURDAY)); // Next Saturday
-        Debug.Log("Next rehearsal date: " + ld.toString());
-
-        Rehearsal rehearsal = new Rehearsal();
-        String start = ld.toString() + " 09:30:00";
-        String end = ld.toString() + " 12:30:00";
-        rehearsal.setDate(ld.toString());
-        rehearsal.setStartTimestamp(Timestamp.valueOf(start).getTime());
-        rehearsal.setEndTimestamp(Timestamp.valueOf(end).getTime());
-        rehearsal.setAddrId(StaticInfo.DEFAULT_ADDR_ID);
-        rehearsal.setEvent(StaticInfo.DEFAULT_EVENT);
-        rehearsal.setState(Rehearsal.STATE.ONGOING);
-
-        // insert into database
-        Rehearsal newRehearsal = rehearsalService.addNewRehearsal(rehearsal);
-        if (newRehearsal != null) {
-            Debug.Log("Insert new rehearsal success.");
-        } else {
-            Debug.Log("Failed to insert new rehearsal.");
+        Boolean rc = rehearsalService.insertNextDefaultRehearsal();
+        if(rc) {
+            Debug.Log("Insert next default rehearsal failed.");
         }
     }
 }
