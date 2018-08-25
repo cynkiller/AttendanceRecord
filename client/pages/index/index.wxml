@@ -47,13 +47,13 @@
                     <!-- 右边提醒
                     <view class="weui-badge" style="margin-left: 5px;">8</view> -->
                 </view>
-                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
             </view>
             <view class="weui-cell weui-cell_access">
                 <view class="weui-cell__bd" bindtap='askleave'>
                     <view style="display: inline-block; vertical-align: middle">我要请假</view>
                 </view>
-                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
             </view>
             <view class="weui-cell weui-cell_access">
                 <view class="weui-cell__bd">
@@ -67,27 +67,36 @@
                 </view>
                 <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
             </view>
-            <view class="weui-cell weui-cell_access" wx:if="{{authority >= 1}}">
-                <!--<view class="weui-cell__bd" bindtap="selectLocation">-->
-                <view class="weui-cell__bd" bindtap="navigate" data-target="setting">
-                    <view style="display: inline-block; vertical-align: middle">设置排练信息</view>
-                </view>
-                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-            </view>
-            <view class="weui-cell weui-cell_access" wx:if="{{authority >= 1}}">
-                <view class="weui-cell__bd">
-                    <view style="display: inline-block; vertical-align: middle">排练概况</view>
-                </view>
-                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
-            </view>
+            <!--
             <view class="weui-cell weui-cell_access">
                 <view class="weui-cell__bd" bindtap="navigate" data-target="logs">
                     <view style="display: inline-block; vertical-align: middle">登录日志</view>
                 </view>
                 <view class="weui-cell__ft weui-cell__ft_in-access"></view>
             </view>
+            -->
         </view>
-          
+
+
+        <view wx:if="{{authority >= 1}}">
+        <view class="weui-cells__title">管理员信息</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_access">
+                <!--<view class="weui-cell__bd" bindtap="selectLocation">-->
+                <view class="weui-cell__bd" bindtap="navigate" data-target="setting">
+                    <view style="display: inline-block; vertical-align: middle">设置排练信息</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+            </view>
+            <view class="weui-cell weui-cell_access">
+                <view class="weui-cell__bd">
+                    <view style="display: inline-block; vertical-align: middle">排练概况</view>
+                </view>
+                <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            </view>
+        </view>
+        </view>
+
         <view class="userinfo">
           <!--
           <block wx:for="{{ jsonmsg }}" wx:for-item="person">

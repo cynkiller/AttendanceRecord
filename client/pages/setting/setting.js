@@ -11,8 +11,6 @@ Page({
    * 页面的初始数据
    */
   data: {
-    // TBD: 从数据库读取
-    // addressBook: []
     settingStatus: {
       settingAddress: false,
       settingDate: false,
@@ -263,6 +261,9 @@ Page({
     var item = event.currentTarget.dataset.item;
     status = (status == true) ? false : true; // 翻转弹出/隐藏状态
     var setting = this.data.settingStatus;
+    for(var key in setting) {
+      setting[key] = false;
+    }
     setting[item] = status;
     this.setData({
       settingStatus: setting
