@@ -111,6 +111,13 @@ public class Utility {
         return result;        */
     }
 
+    public static String retmsg(String format, StaticInfo.StatusCode status, String arg1, String arg2) {
+        String outString;
+        outString = String.format(format, status, arg1, arg2);
+        Debug.Log(outString);
+        return new JSONObject(outString).toString();  
+    }
+
     public static String retmsg(String format, StaticInfo.StatusCode status, String remark) {
         String outString;
         outString = String.format(format, status, remark);

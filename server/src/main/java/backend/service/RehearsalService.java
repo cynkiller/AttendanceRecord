@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.domain.Sort;
 
 import backend.repo.RehearsalRepository;
 import backend.util.Debug;
@@ -31,6 +32,17 @@ public class RehearsalService {
     @Autowired
     private RehearsalRepository rehearsalRepository;
 
+    private Long getLargestId() {
+        Query query = new Query();
+        query.with(new Sort(Sort.Direction.DESC, "id"));
+        query.fields().include("id");
+        Rehearsal rehearsal = mongoTemplate.findOne(query, Rehearsal.class);
+        if (rehearsal != null)
+            return rehearsal.getId();
+        else
+            return null;
+    }
+
     public Rehearsal getLastRehearsal() {
         return rehearsalRepository.findFirstByOrderByStartTimestampDesc();
     }
@@ -40,10 +52,15 @@ public class RehearsalService {
         ld = ld.with(TemporalAdjusters.next(DayOfWeek.SATURDAY)); // Next Saturday
         Debug.Log("Next rehearsal date: " + ld.toString());
 
+        Long lastid = getLargestId();
+        if (lastid == null) {
+            lastid = 0l;
+        }
         Rehearsal rehearsal = new Rehearsal();
         String start = ld.toString() + " 09:30:00";
         String end = ld.toString() + " 12:30:00";
         rehearsal.setDate(ld.toString());
+        rehearsal.setId(lastid + 1);
         rehearsal.setIsHoliday(false);
         rehearsal.setStartTimestamp(Timestamp.valueOf(start).getTime());
         rehearsal.setEndTimestamp(Timestamp.valueOf(end).getTime());

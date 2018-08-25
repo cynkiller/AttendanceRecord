@@ -38,5 +38,6 @@ public class BackgroundService implements SchedulingConfigurer{
         RehearsalTask rt = new RehearsalTask("RehearsalTask", rehearsalService);
         //taskScheduler.schedule(rt, new CronTrigger("0 13 * * * ?")); // Every day at 13:00
         taskRegistrar.addCronTask(rt, "0 0 13 * * ?");
+        rt.run();
     }
 }

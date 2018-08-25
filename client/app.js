@@ -1,5 +1,4 @@
 //app.js
-
 const req = require('utils/request.js')
 const util = require('utils/util.js')
 
@@ -53,16 +52,23 @@ App({
     },
     point: null
   },
+  backendUser: null,
   rehearsalInfo: {
     rehearsalDate: {
-      date: "2018-06-06",
-      startTime: "09:00",
-      endTime: "12:30"
+      date: "1970-01-01",
+      startTime: "00:00",
+      endTime: "00:00",
+      addrId: -1,
+      isHoliday: false,
+      event: null,
+      state: null
     },
-    //rehearsalTime: "2018年6月2日 9:30 - 12:30",
-    rehearsalLocation: "地点名称 地址",
-    longitude: 121,
-    latitude: 31,
+    address: {
+      location: null,
+      address: null,
+      longitude: 0,
+      latitude: 0
+    },
     addressBook: []
   },
 })

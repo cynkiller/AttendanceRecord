@@ -1,6 +1,9 @@
 package backend.controller;
 
 import org.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import backend.service.SessionService;
+import backend.service.AddressService;
 import backend.service.RehearsalService;
 import backend.service.UserInfoService;
 import backend.util.Debug;
 import backend.util.StaticInfo;
 import backend.util.Utility;
 import backend.model.Rehearsal;
+import backend.model.Address;
 import backend.model.UserInfo;
 import java.util.List;
 
@@ -25,6 +30,9 @@ import java.util.List;
 public class RehearsalController {
     @Autowired
     private RehearsalService rehearsalService;
+
+    @Autowired
+    private AddressService addressService;
 
     @Autowired
     private SessionService sessionService;
@@ -100,8 +108,17 @@ public class RehearsalController {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
         }
 
-        // TBD
-        return null;
+        Rehearsal rehearsal = rehearsalService.getLastRehearsal();
+        Address address = addressService.getAddressById(rehearsal.getAddrId());
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String rhsl = mapper.writeValueAsString(rehearsal);
+            String adrs = mapper.writeValueAsString(address);
+            return Utility.retmsg("{ status: %s, data: %s, address: %s }", StaticInfo.StatusCode.GENERAL_OK, rhsl, adrs);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
+        }
     }
 
     @RequestMapping(value = "/setRehearsalInfo", method = RequestMethod.POST, produces = "application/json")

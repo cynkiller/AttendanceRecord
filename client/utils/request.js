@@ -49,8 +49,8 @@ function getUserInfo(data, func, obj) {
     setTimeout(function (obj) {
       obj.setData({
         updatefail: false
-      }, obj)
-    }, 3000)
+      })
+    }, 3000, obj)
   } else if (data.status == "SERVER_SESSION_EXPIRED") {
     util.info("Login session expired.")
     console.log(obj)

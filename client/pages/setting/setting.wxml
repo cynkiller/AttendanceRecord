@@ -113,7 +113,7 @@
             <view class="weui-cell__bd">
                 <view style="display: inline-block; vertical-align: middle">修改口令</view>
             </view>
-            <view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>
+            <!--<view class="weui-cell__ft weui-cell__ft_in-access">开发中</view>-->
         </view>
 
         <view wx:if="{{settingStatus.modifyPassword}}">

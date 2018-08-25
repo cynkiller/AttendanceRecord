@@ -86,7 +86,6 @@ Page({
         }
       }
     })
-
   },
 
   showpage: function() {
@@ -101,7 +100,7 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-  
+    
   },
 
   onPullDownRefresh: function() {
@@ -114,31 +113,31 @@ Page({
     if(this.data.showpage) {
       this.onShowOperation();
       if(this.data.interval !== undefined) {
+        // Refresh location every 60 seconds
         this.data.interval = setInterval(this.onShowOperation, 60000);
       }
     }
   },
 
-  onShowOperation() {
-    // TBD: get rehearsal info from backend
+  rehearsalInfoCallback: function(obj) {
     this.data.markers[0].longitude = app.rehearsalInfo.longitude;
     this.data.markers[0].latitude = app.rehearsalInfo.latitude;
-    this.data.includePoints[0].longitude = app.rehearsalInfo.longitude;
-    this.data.includePoints[0].latitude = app.rehearsalInfo.latitude;
+    this.data.includePoints[0].longitude = app.rehearsalInfo.address.longtitude;
+    this.data.includePoints[0].latitude = app.rehearsalInfo.address.latitude;
     this.setData({
       rehearsalDate: app.rehearsalInfo.rehearsalDate,
       readableDate: util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
-      rehearsalLocation: app.rehearsalInfo.rehearsalLocation,
+      rehearsalLocation: app.rehearsalInfo.address.address + " " + app.rehearsalInfo.address.location,
       markers: this.data.markers,
       includePoints: this.data.includePoints
     })
     util.debug(this.data.markers);
     util.getCurrentPosition(this);
     var distance = util.getGpsDisance(
-          this.data.includePoints[0].latitude,
-          this.data.includePoints[0].longitude,
-          this.data.includePoints[1].latitude,
-          this.data.includePoints[1].longitude);
+      this.data.includePoints[0].latitude,
+      this.data.includePoints[0].longitude,
+      this.data.includePoints[1].latitude,
+      this.data.includePoints[1].longitude);
     util.debug("distance:", distance)
     var remain = rehearsal.getRemainTime(this);
     if (rehearsal.isValidSigninTime(this) && this.data.signined == false && distance <= 10) {
@@ -166,6 +165,15 @@ Page({
         })
       }
     }
+  },
+
+  onShowOperation() {
+
+    // get rehearsal info from backend
+    if (app.rehearsalInfo.address.location == null)
+      rehearsal.getNextRehearsal(this, this.rehearsalInfoCallback)
+    else
+      this.rehearsalInfoCallback();
   },
 
   /**

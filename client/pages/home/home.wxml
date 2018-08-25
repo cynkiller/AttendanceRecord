@@ -1,6 +1,7 @@
 <!--pages/home/home.wxml-->
 <view wx:if="{{showpage}}">
 <view class="page">
+    <view class="weui-toptips weui-toptips_warn" wx:if="{{updatefail}}">{{failmsg}}</view>
     <view class="page__hd">
         <view class="page__title">排练信息</view>
         <view class="page__desc">排练时间：{{readableDate}} {{rehearsalDate.startTime}} - {{rehearsalDate.endTime}} </view>

@@ -67,7 +67,7 @@ Page({
     this.setData({
       rehearsalDate: app.rehearsalInfo.rehearsalDate,
       readableDate: util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
-      rehearsalLocation: app.rehearsalInfo.rehearsalLocation,
+      rehearsalLocation: app.rehearsalInfo.address.address + " " + app.rehearsalInfo.address.location,
       strategies: strtgs,
       strategyIndex: 30
     })
@@ -84,8 +84,8 @@ Page({
       setTimeout(function (obj) {
         obj.setData({
           updatefail: false
-        }, obj)
-      }, 3000)
+        })
+      }, 3000, obj)
     } else if (data.status == "SERVER_SESSION_EXPIRED") {
       util.info("Login session expired.")
       app.loginReady = false;
@@ -105,8 +105,8 @@ Page({
       setTimeout(function (obj) {
         obj.setData({
           updatefail: false
-        }, obj)
-      }, 3000)
+        })
+      }, 3000, obj)
     } else if (data.status == "SERVER_ADDRESS_EXIST") {
       obj.setData({
         updatefail: true,
@@ -115,8 +115,8 @@ Page({
       setTimeout(function (obj) {
         obj.setData({
           updatefail: false
-        }, obj)
-      }, 3000)
+        })
+      }, 3000, obj)
     } else if (data.status == "SERVER_ADDRESS_NOT_EXIST") {
       obj.setData({
         updatefail: true,
@@ -125,8 +125,8 @@ Page({
       setTimeout(function (obj) {
         obj.setData({
           updatefail: false
-        }, obj)
-      }, 3000)
+        })
+      }, 3000, obj)
     } else if (data.status == "SERVER_INTERNAL_ERROR") {
       obj.setData({
         updatefail: true,
@@ -135,8 +135,8 @@ Page({
       setTimeout(function (obj) {
         obj.setData({
           updatefail: false
-        }, obj)
-      }, 3000)
+        })
+      }, 3000, obj)
     } else if (data.status == "GENERAL_OK") {
       util.info("Update successful.")
       if (callback) callback(data, obj)

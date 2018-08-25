@@ -1,4 +1,6 @@
 const util = require("util.js");
+const request = require("request.js")
+const app = getApp();
 
 function timestamps(obj) {
   var timestamps = {};
@@ -30,6 +32,16 @@ function timestamps(obj) {
   return timestamps;
 }
 
+function timestampToTime(ts) {
+  var date = new Date(ts);
+  var hours = date.getHours();
+  var minutes = "0" + date.getMinutes();
+  //var seconds = "0" + date.getSeconds();
+  //var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+  var formattedTime = hours + ':' + minutes.substr(-2)
+  return formattedTime;
+}
+
 const isValidSigninTime = obj => {
   var ts = timestamps(obj);
   if (ts['current'] >= ts['start'] && ts['current'] <= ts['end'])
@@ -52,7 +64,50 @@ const getRemainTime = obj => {
     return null;
 }
 
+function getNextRehearsalCallback(data, callback, obj) {
+  //util.debug(data)
+  util.info("enter getNextRehearsalCallback")
+  if (!data.status) {
+    util.info("Remote backend problem. Failed to change userinfo.")
+    obj.setData({
+      updatefail: true,
+      failmsg: "无法连接服务器。。更新失败"
+    })
+    setTimeout(function (obj) {
+      obj.setData({
+        updatefail: false
+      })
+    }, 3000, obj)
+  } else if (data.status == "SERVER_SESSION_EXPIRED") {
+    util.info("Login session expired.")
+    app.loginReady = false;
+    obj.setData({
+      updatefail: true,
+      failmsg: "重新登陆中。。"
+    })
+    // relogin
+    request.weixinUserLogin(app, true, function (obj) {
+      obj.setData({ updatefail: false })
+    }, obj)
+  } else if (data.status == "SERVER_INTERNAL_ERROR") {
+    util.info("Server internal error.")
+    // TBD
+  } else if (data.status == "GENERAL_OK") {
+    util.info("Update successful.")
+    app.rehearsalInfo.rehearsalDate = JSON.parse(JSON.stringify(data.data));
+    app.rehearsalInfo.rehearsalDate.startTime = timestampToTime(app.rehearsalInfo.rehearsalDate.startTimestamp);
+    app.rehearsalInfo.rehearsalDate.endTime = timestampToTime(app.rehearsalInfo.rehearsalDate.endTimestamp);
+    app.rehearsalInfo.address = JSON.parse(JSON.stringify(data.address));
+    callback(obj)
+  }
+}
+
+function getNextRehearsal(obj, callback) {
+  request.getRequest("/getRehearsalInfo", getNextRehearsalCallback, callback, obj);
+}
+
 module.exports = {
   isValidSigninTime: isValidSigninTime,
-  getRemainTime: getRemainTime
+  getRemainTime: getRemainTime,
+  getNextRehearsal: getNextRehearsal
 }
