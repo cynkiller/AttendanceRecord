@@ -2,25 +2,27 @@ const util = require("util.js");
 const request = require("request.js")
 const app = getApp();
 
+function toTimestamp(_date, _time) {
+  var date = new Date();
+  // Note month need to minus 1, Jun => 5
+  var ymd = _date.split('-');
+  date.setFullYear(ymd[0], ymd[1] - 1, ymd[2]);
+
+  // time
+  var time = _time.split(":");
+  date.setHours(parseInt(time[0]), parseInt(time[1]));
+
+  util.debug(date)
+  return date.getTime();
+}
+
 function timestamps(obj) {
   var timestamps = {};
   var rehearsalDate = obj.data.rehearsalDate;
-  var date = new Date();
-  // Note month need to minus 1, Jun => 5
-  var ymd = rehearsalDate.date.split('-');
-  date.setFullYear(ymd[0], ymd[1] - 1, ymd[2]);
-
-  // start time
-  var time = rehearsalDate.startTime.split(":");
-  date.setHours(parseInt(time[0]), parseInt(time[1]));
-  var startTimestamp = date.getTime();
-  util.debug("Start Date", date, "Start timestamp: ", startTimestamp)
-
-  // end time
-  time = rehearsalDate.endTime.split(":");
-  date.setHours(parseInt(time[0]), parseInt(time[1]));
-  var endTimestamp = date.getTime();
-  util.debug("End Date", date, "End timestamp: ", endTimestamp)
+  var startTimestamp = toTimestamp(rehearsalDate.date, rehearsalDate.startTime)
+  var endTimestamp = toTimestamp(rehearsalDate.date, rehearsalDate.endTime)
+  util.debug("Start timestamp: ", startTimestamp)
+  util.debug("End timestamp: ", endTimestamp)
 
   var currentdate = new Date();
   var currentTimestamp = currentdate.getTime();
@@ -108,6 +110,8 @@ function getNextRehearsal(obj, callback) {
 
 module.exports = {
   isValidSigninTime: isValidSigninTime,
+  toTimestamp: toTimestamp,
+  timestampToTime: timestampToTime,
   getRemainTime: getRemainTime,
   getNextRehearsal: getNextRehearsal
 }

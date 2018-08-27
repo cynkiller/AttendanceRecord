@@ -125,17 +125,26 @@ public class RehearsalController {
     public String setRehearsalInfo(
         @RequestHeader("thirdSessionKey") String sessionKey,
         @RequestParam(value = "date") String date,
-        @RequestParam(value = "starttime") String start,
-        @RequestParam(value = "endtime") String end,
+        @RequestParam(value = "startTimestamp") long start,
+        @RequestParam(value = "endTimestamp") long end,
         @RequestParam(value = "isHoliday") Boolean isHoliday,
-        @RequestParam(value = "event") String event)
+        @RequestParam(value = "event") String event,
+        @RequestParam(value = "addrId") long addrId)
     {
         Debug.Log("Enter setRehearsalInfo");
+        Debug.Log(String.format("%s %s %d %d %b %d", date, event, start, end, isHoliday, addrId));
 
         // Check if session is valid, Get openid from session
         String openid = sessionService.getValidOpenid(sessionKey);
         if (openid == null) {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+        }
+
+        // Check authority
+        UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+        UserInfo.AUTH auth = userinfo.getAuthority();
+        if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
         }
 
         // TBD

@@ -11,19 +11,35 @@
    <view wx:if="{{authority >= 1}}">
     <view class="weui-cells__title"></view>
     <view class="weui-cells weui-cells_after-title">
-        <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="settingAddress" data-status="{{settingStatus.settingAddress}}">
+
+        <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="settingRehearsal" data-status="{{settingStatus.settingRehearsal}}">
             <view class="weui-cell__bd">
-                <view style="display: inline-block; vertical-align: middle">设置排练地址</view>
+                <view style="display: inline-block; vertical-align: middle">设置排练信息</view>
             </view>
             <view class="weui-cell__ft weui-cell__ft_in-access"></view>
         </view>
-        <view style="padding-left: 10px" wx:if="{{settingStatus.settingAddress}}">
+
+    <form bindsubmit="updateRehearsal" class="password">
+
+        <view style="padding-left: 10px" wx:if="{{settingStatus.settingRehearsal}}">
+          <view class="weui-cell weui-cell_input" style="font-size: 15px;">
+            <view class="weui-cell__hd">
+                <view class="weui-label">主题</view>
+            </view>
+            <view class="weui-cell__bd">
+              <input class="weui-input" name="event" placeholder="{{mod_event}}" auto-focus/>
+            </view>
+          </view>
+        </view>
+
+        <view style="padding-left: 10px" wx:if="{{settingStatus.settingRehearsal}}">
+          <view class="weui-cells__title">选择排练地址</view>
           <view class="weui-cells weui-cells_after-title">
               <radio-group bindchange="updateAddress">
                   <label class="weui-cell weui-check__label" wx:for="{{addressBook}}" wx:key="value">
                       <radio class="weui-check" value="{{item.address}}" checked="{{item.checked}}"/>
 
-                      <view class="weui-cell__bd">{{item.location}}</view>
+                      <view class="weui-cell__bd" style="font-size: 15px;">{{item.location}}</view>
                       <view class="weui-cell_link" bindtap="removeAddress" data-index="{{index}}">删除</view>
                       <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{item.checked}}">
                           <icon class="weui-icon-radio" type="success_no_circle" size="16"></icon>
@@ -35,17 +51,11 @@
               </view>
           </view>
         </view>
+
         <!--<view class="weui-cells__title">{{address}}</view>-->
-
-        <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="settingDate" data-status="{{settingStatus.settingDate}}">
-            <view class="weui-cell__bd">
-                <view style="display: inline-block; vertical-align: middle">设置排练时间</view>
-            </view>
-            <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-        </view>
-
-        <view style="padding-left: 10px" wx:if="{{settingStatus.settingDate}}">
-          <view class="weui-cell weui-cell_input">
+        <view style="padding-left: 10px" wx:if="{{settingStatus.settingRehearsal}}">
+          <view class="weui-cells__title">排练时间</view>
+          <view class="weui-cell">
             <view class="cell-date datelabel">日期</view>
             <span class="verticalLine"></span>
             <view class="cell-start datelabel">开始</view>
@@ -55,31 +65,41 @@
           <view class="weui-cell weui-cell_input">
               <view class="cell-date">
                   <picker mode="date" value="{{date}}" start="2015-01-01" end="2099-12-31" bindchange="bindDateChange">
-                      <view class="weui-input">{{rehearsalDate.date}}</view>
+                      <view class="weui-input">{{mod_date}}</view>
                   </picker>
               </view>
               <span class="verticalLine"></span>
               <view class="cell-start">
                   <picker mode="time" value="{{time}}" start="00:00" end="23:59" bindchange="bindStartTimeChange">
-                      <view class="weui-input">{{rehearsalDate.startTime}}</view>
+                      <view class="weui-input">{{mod_startTime}}</view>
                   </picker>
               </view>
               <span class="verticalLine"></span>
               <view class="cell-end">
                   <picker mode="time" value="{{time}}" start="00:00" end="23:59" bindchange="bindEndTimeChange">
-                      <view class="weui-input">{{rehearsalDate.endTime}}</view>
+                      <view class="weui-input">{{mod_endTime}}</view>
                   </picker>
               </view>
           </view>
           <view class="weui-cell weui-cell_input">
               <view class="weui-cell">
-                  <view class="datelabel">是否节假日</view>
+                  <view class="datelabel" style="font-size: 15px;">是否节假日</view>
               </view>
               <view class="weui-cell__ft">
-                  <switch checked class="wx-switch-input"/>
+                <view wx:if="{{mod_isHoliday}}">
+                  <switch checked class="wx-switch-input" bindchange='isHolidayChange'/>
+                </view>
+                <view wx:else>
+                   <switch class="wx-switch-input" bindchange='isHolidayChange'/>
+                </view>
               </view>
           </view>
+
+          <view class="weui-btn-area" style="text-align: right">
+              <button class="weui-btn"  formType="submit" type="primary" size="mini">确认修改</button>
+          </view>
         </view>
+    </form>
 
         <view class="weui-cell weui-cell_access" bindtap="settingStatus" data-item="modifyPoint" data-status="{{settingStatus.modifyPoint}}">
             <view class="weui-cell__bd">

@@ -15,6 +15,6 @@ public class Address {
 
     @Override
     public String toString() {
-        return String.format("{ location: %s, address: %s, longtitude: %f, latitude: %f }", this.location, this.address, this.longtitude, this.latitude);
+        return String.format("{addrId: %d, location: %s, address: %s, longtitude: %f, latitude: %f }", this.id, this.location, this.address, this.longtitude, this.latitude);
     }
 }

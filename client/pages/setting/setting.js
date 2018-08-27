@@ -12,8 +12,7 @@ Page({
    */
   data: {
     settingStatus: {
-      settingAddress: false,
-      settingDate: false,
+      settingRehearsal: false,
       managingAdministrator: false,
       modifyPoint: false
     },
@@ -66,6 +65,11 @@ Page({
       rehearsalDate: app.rehearsalInfo.rehearsalDate,
       readableDate: util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
       rehearsalLocation: app.rehearsalInfo.address.address + " " + app.rehearsalInfo.address.location,
+      mod_event: app.rehearsalInfo.rehearsalDate.event,
+      mod_date: app.rehearsalInfo.rehearsalDate.date,
+      mod_startTime: app.rehearsalInfo.rehearsalDate.startTime,
+      mod_endTime: app.rehearsalInfo.rehearsalDate.endTime,
+      mod_isHoliday: app.rehearsalInfo.rehearsalDate.isHoliday,
       strategies: strtgs,
       strategyIndex: 30
     })
@@ -145,8 +149,15 @@ Page({
     util.debug(data.data)
     util.info("enter queryAddressCallback")
     if (data.hasOwnProperty("data")) data = data.data;
+    for (var i = 0, len = data.length; i < len; ++i) {
+      if (data[i].addrId == app.rehearsalInfo.rehearsalDate.addrId) {
+        data[i].checked = 1;
+        break;
+      }
+    }
     obj.setData({
-      addressBook: data
+      addressBook: data,
+      mod_addrId: data[i].addrId
     })
   },
 
@@ -235,7 +246,7 @@ Page({
         address['latitude'] = res.latitude;
         address['longitude'] = res.longitude;
 
-        // Update backend database， TBD callback function
+        // Update backend database
         request.postRequest("/admin/addNewAddress", address, that.addressCallback, that.addAddressCallback, that);
       },
       fail: function () {
@@ -286,11 +297,12 @@ Page({
 
     this.setData({
       addressBook: addressBook,
-      rehearsalLocation: addressBook[addressIdx].location + ' ' + addressBook[addressIdx].address
+      mod_addrId: addressBook[addressIdx].addrId
+      //rehearsalLocation: addressBook[addressIdx].location + ' ' + addressBook[addressIdx].address
     });
-    app.rehearsalInfo.rehearsalLocation = addressBook[addressIdx].location + ' ' + addressBook[addressIdx].address;
-    app.rehearsalInfo.latitude = addressBook[addressIdx].latitude;
-    app.rehearsalInfo.longitude = addressBook[addressIdx].longitude;
+    //app.rehearsalInfo.rehearsalLocation = addressBook[addressIdx].location + ' ' + addressBook[addressIdx].address;
+    //app.rehearsalInfo.latitude = addressBook[addressIdx].latitude;
+    //app.rehearsalInfo.longitude = addressBook[addressIdx].longitude;
   },
 
   removeAddress: function(event) {
@@ -314,35 +326,64 @@ Page({
   /* 更新排练日期 */
   bindDateChange: function( event ) {
     util.debug('date发生change事件，携带value值为：', event.detail.value);
-    app.rehearsalInfo.rehearsalDate.date = event.detail.value;
-    var rehearsalDate = this.data.rehearsalDate;
-    rehearsalDate.date = event.detail.value;
+    //app.rehearsalInfo.rehearsalDate.date = event.detail.value;
+    //var rehearsalDate = this.data.rehearsalDate;
+    //rehearsalDate.date = event.detail.value;
     this.setData({
-      rehearsalDate: rehearsalDate,
-      readableDate: util.toReadableDate(rehearsalDate.date)
+      modi_date: event.detail.value
+      //rehearsalDate: rehearsalDate,
+      //readableDate: util.toReadableDate(rehearsalDate.date)
     })
   },
 
   /* 更新开始排练时间 */
   bindStartTimeChange: function( event ) {
     util.debug('startTime发生change事件，携带value值为：', event.detail.value);
-    app.rehearsalInfo.rehearsalDate.startTime = event.detail.value;
-    var rehearsalDate = this.data.rehearsalDate;
-    rehearsalDate.startTime = event.detail.value;
+    //app.rehearsalInfo.rehearsalDate.startTime = event.detail.value;
+    //var rehearsalDate = this.data.rehearsalDate;
+    //rehearsalDate.startTime = event.detail.value;
     this.setData({
-      rehearsalDate: rehearsalDate
+      mod_startTime: event.detail.value
     })
   },
 
   /* 更新结束排练时间 */
   bindEndTimeChange: function (event) {
     util.debug('endTime发生change事件，携带value值为：', event.detail.value);
-    app.rehearsalInfo.rehearsalDate.endTime = event.detail.value;
-    var rehearsalDate = this.data.rehearsalDate;
-    rehearsalDate.endTime = event.detail.value;
+    //app.rehearsalInfo.rehearsalDate.endTime = event.detail.value;
+    //var rehearsalDate = this.data.rehearsalDate;
+    //rehearsalDate.endTime = event.detail.value;
     this.setData({
-      rehearsalDate: rehearsalDate
+      mod_endTime: event.detail.value
     })
+  },
+
+  isHolidayChange: function (event) {
+    util.debug('isHolidayChange发生change事件，携带value值为：', event.detail.value);
+    this.setData({
+      mod_isHoliday: event.detail.value
+    })
+  },
+
+  updateRehearsal: function( event) {
+    util.debug('updateRehearsal，携带value值为：', event.detail.value);
+    var event = event.detail.value.event;
+    if (event == "") {
+      event = this.data.mod_event
+    }
+    util.debug(event, this.data.mod_addrId, this.data.mod_date, this.data.mod_startTime, this.data.mod_endTime, this.data.mod_isHoliday, app.rehearsalInfo.rehearsalDate.state)
+    var startTimestamp = rehearsal.toTimestamp(this.data.mod_date, this.data.mod_startTime)
+    var endTimestamp = rehearsal.toTimestamp(this.data.mod_date, this.data.mod_endTime)
+    util.debug(startTimestamp, endTimestamp)
+    util.debug(rehearsal.timestampToTime(startTimestamp), rehearsal.timestampToTime(endTimestamp))
+    var sendData = {}
+    sendData['date'] = this.data.mod_date;
+    sendData['startTimestamp'] = startTimestamp;
+    sendData['endTimestamp'] = endTimestamp;
+    sendData['isHoliday'] = this.data.mod_isHoliday;
+    sendData['event'] = event;
+    sendData['addrId'] = this.data.mod_addrId;
+    request.postRequest('/setRehearsalInfo', sendData) // TBD: callbacks
   },
 
   addAdministrator: function (event) {
@@ -367,7 +408,7 @@ Page({
     })
   },
   removeAdministrator: function (event) {
-    util.log('removeAdministrator发生change事件，携带index值为：', event.currentTarget.dataset.index);
+    util.debug('removeAdministrator发生change事件，携带index值为：', event.currentTarget.dataset.index);
     var idx = event.currentTarget.dataset.index;
     var admins = this.data.administrators;
     var candidate = admins[idx];
@@ -401,7 +442,7 @@ Page({
   },
 
   selectStrategy: function( event ) {
-    util.log('selectStrategy发生change事件，携带strategyIndex值为：', event.detail.value);
+    util.debug('selectStrategy发生change事件，携带strategyIndex值为：', event.detail.value);
     var idx = event.detail.value;
     this.setData({
       strategyIndex: idx
