@@ -330,7 +330,7 @@ Page({
     //var rehearsalDate = this.data.rehearsalDate;
     //rehearsalDate.date = event.detail.value;
     this.setData({
-      modi_date: event.detail.value
+      mod_date: event.detail.value
       //rehearsalDate: rehearsalDate,
       //readableDate: util.toReadableDate(rehearsalDate.date)
     })
@@ -377,6 +377,7 @@ Page({
     util.debug(startTimestamp, endTimestamp)
     util.debug(rehearsal.timestampToTime(startTimestamp), rehearsal.timestampToTime(endTimestamp))
     var sendData = {}
+    sendData['id'] = app.rehearsalInfo.rehearsalDate.id;
     sendData['date'] = this.data.mod_date;
     sendData['startTimestamp'] = startTimestamp;
     sendData['endTimestamp'] = endTimestamp;

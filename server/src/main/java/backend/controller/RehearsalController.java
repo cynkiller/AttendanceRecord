@@ -41,12 +41,19 @@ public class RehearsalController {
 	@Autowired
     private UserInfoService userInfoService;
 
-    @RequestMapping(value = "/setRehearsalAddress", method = RequestMethod.POST, produces = "application/json")
-    public String setRehearsalAddress(
+    @RequestMapping(value = "/setRehearsalInfo", method = RequestMethod.POST, produces = "application/json")
+    public String setRehearsalInfo(
         @RequestHeader("thirdSessionKey") String sessionKey,
-        @RequestParam(value = "addressUid") String addressUid)
+        @RequestParam(value = "id", required = false) Long id,
+        @RequestParam(value = "date") String date,
+        @RequestParam(value = "startTimestamp") long start,
+        @RequestParam(value = "endTimestamp") long end,
+        @RequestParam(value = "isHoliday") Boolean isHoliday,
+        @RequestParam(value = "event") String event,
+        @RequestParam(value = "addrId") long addrId)
     {
-        Debug.Log("Enter setRehearsalAddress");
+        Debug.Log("Enter setRehearsalInfo");
+        Debug.Log(String.format("%d %s %s %d %d %b %d", id, date, event, start, end, isHoliday, addrId));
 
         // Check if session is valid, Get openid from session
         String openid = sessionService.getValidOpenid(sessionKey);
@@ -60,12 +67,12 @@ public class RehearsalController {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
         }
 
-        // Change rehearsal addressUid
+        // Check rehearsal status
         Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
-        String date = lastRehearsal.getDate();
+        String l_date = lastRehearsal.getDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            Date r_date = sdf.parse(date);
+            Date r_date = sdf.parse(l_date);
             Date c_date = sdf.parse(sdf.format(new Date()));
             if (c_date.after(r_date)) {
                 // Rehearsal not updated
@@ -84,9 +91,15 @@ public class RehearsalController {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
         }
 
-        JSONObject info = new JSONObject();
-        info.put("addrId", addressUid);
-        Boolean rc = rehearsalService.findAndModifyRehearsal(lastRehearsal.getId(), info);
+        // Update rehearsal info
+        JSONObject update = new JSONObject();
+        update.put("date", date);
+        update.put("startTimestamp", start);
+        update.put("endTimestamp", end);
+        update.put("isHoliday", isHoliday);
+        update.put("event", event);
+        update.put("addrId", addrId);
+        Boolean rc = rehearsalService.findAndModifyRehearsal(id, update);
 
         // Exception check
         if (!rc) {
@@ -119,35 +132,5 @@ public class RehearsalController {
             e.printStackTrace();
             return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
         }
-    }
-
-    @RequestMapping(value = "/setRehearsalInfo", method = RequestMethod.POST, produces = "application/json")
-    public String setRehearsalInfo(
-        @RequestHeader("thirdSessionKey") String sessionKey,
-        @RequestParam(value = "date") String date,
-        @RequestParam(value = "startTimestamp") long start,
-        @RequestParam(value = "endTimestamp") long end,
-        @RequestParam(value = "isHoliday") Boolean isHoliday,
-        @RequestParam(value = "event") String event,
-        @RequestParam(value = "addrId") long addrId)
-    {
-        Debug.Log("Enter setRehearsalInfo");
-        Debug.Log(String.format("%s %s %d %d %b %d", date, event, start, end, isHoliday, addrId));
-
-        // Check if session is valid, Get openid from session
-        String openid = sessionService.getValidOpenid(sessionKey);
-        if (openid == null) {
-            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
-        }
-
-        // Check authority
-        UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
-        UserInfo.AUTH auth = userinfo.getAuthority();
-        if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
-            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
-        }
-
-        // TBD
-        return null;
     }
 }

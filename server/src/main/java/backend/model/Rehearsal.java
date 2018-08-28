@@ -16,7 +16,7 @@ public class Rehearsal {
     }
 
     
-    @Id @JsonIgnore private Long id;
+    @Id private Long id;
     private long startTimestamp;
     private long endTimestamp;
     private String date;        // xxxx-xx-xx
