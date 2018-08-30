@@ -365,6 +365,63 @@ Page({
     })
   },
 
+  updateRehearsalDone: function(obj) {
+    var status = this.data.settingStatus
+    status.settingRehearsal = false;
+    obj.setData({
+      rehearsalDate: app.rehearsalInfo.rehearsalDate,
+      readableDate: util.toReadableDate(app.rehearsalInfo.rehearsalDate.date),
+      rehearsalLocation: app.rehearsalInfo.address.address + " " + app.rehearsalInfo.address.location,
+      settingStatus: status
+    })
+    wx.showToast({
+      title: '更新成功',
+    })
+  },
+
+  updateRehearsalCallback: function( data, callback, obj ) {
+    util.info("enter updateRehearsalCallback")
+    if (!data.status) {
+      util.info("Remote backend problem. Failed to change userinfo.")
+      obj.setData({
+        updatefail: true,
+        failmsg: "无法连接服务器。。更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "SERVER_SESSION_EXPIRED") {
+      util.info("Login session expired.")
+      app.loginReady = false;
+      obj.setData({
+        updatefail: true,
+        failmsg: "重新登陆中。。"
+      })
+      // relogin
+      request.weixinUserLogin(app, true, function (obj) {
+        obj.setData({ updatefail: false })
+      }, obj)
+    } else if (data.status == "SERVER_INTERNAL_ERROR") {
+      util.info("Server internal error.")
+      // TBD
+    } else if (data.status == "SERVER_REHEARSAL_UPDATE_FAIL") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "排练信息更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "GENERAL_OK") {
+      util.info("Update successful.")
+      rehearsal.getNextRehearsal(this, this.updateRehearsalDone)
+    }
+  },
+
   updateRehearsal: function( event) {
     util.debug('updateRehearsal，携带value值为：', event.detail.value);
     var event = event.detail.value.event;
@@ -384,7 +441,7 @@ Page({
     sendData['isHoliday'] = this.data.mod_isHoliday;
     sendData['event'] = event;
     sendData['addrId'] = this.data.mod_addrId;
-    request.postRequest('/setRehearsalInfo', sendData) // TBD: callbacks
+    request.postRequest('/setRehearsalInfo', sendData, this.updateRehearsalCallback, this) // TBD: callbacks
   },
 
   addAdministrator: function (event) {
