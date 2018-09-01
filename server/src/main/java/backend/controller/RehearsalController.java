@@ -102,7 +102,7 @@ public class RehearsalController {
         Boolean rc = rehearsalService.findAndModifyRehearsal(id, update);
 
         // Exception check
-        if (!rc) {
+        if (rc) {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_REHEARSAL_UPDATE_FAIL);
         }
 

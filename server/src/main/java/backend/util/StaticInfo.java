@@ -1,5 +1,6 @@
 package backend.util;
 
+import java.util.HashMap;
 import backend.model.UserInfo;
 
 public class StaticInfo {
@@ -24,4 +25,14 @@ public class StaticInfo {
     public static UserInfo.AUTH DEFAULT_AUTH = UserInfo.AUTH.MEMBER;
     public static Long DEFAULT_ADDR_ID = 3l; // TBD
     public static String DEFAULT_EVENT = "Rehearsal";
+    public static HashMap<UserInfo.ATTEND, Integer> strategy = new HashMap<UserInfo.ATTEND, Integer>() {
+        {
+            put(UserInfo.ATTEND.ABSENCE, -12);
+            put(UserInfo.ATTEND.ASK_LEAVE, -6);
+            put(UserInfo.ATTEND.LATE, -3);
+            put(UserInfo.ATTEND.ON_TIME, 0);
+            put(UserInfo.ATTEND.WELFARE, 10);  // should be changed
+        }
+    };
+    public static Integer DEFAULT_REMAIN_POINT = 99999;
 }

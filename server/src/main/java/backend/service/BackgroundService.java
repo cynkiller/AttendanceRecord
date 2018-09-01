@@ -20,6 +20,9 @@ public class BackgroundService implements SchedulingConfigurer{
     @Autowired
     private RehearsalService rehearsalService;
 
+    @Autowired
+    private UserInfoService userInfoService;
+
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         /*
@@ -35,7 +38,7 @@ public class BackgroundService implements SchedulingConfigurer{
         taskRegistrar.setScheduler(taskScheduler);
 		//taskScheduler.schedule(new BackgroundService("Set Next Rehearsal Information"), new CronTrigger("0 13 * * 6 ?")); // Saturday 13:00
         //BackgroundService bs = new BackgroundService("Set Next Rehearsal Information");
-        RehearsalTask rt = new RehearsalTask("RehearsalTask", rehearsalService);
+        RehearsalTask rt = new RehearsalTask("RehearsalTask", rehearsalService, userInfoService);
         //taskScheduler.schedule(rt, new CronTrigger("0 13 * * * ?")); // Every day at 13:00
         taskRegistrar.addCronTask(rt, "0 0 13 * * ?");
         rt.run();

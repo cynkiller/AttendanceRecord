@@ -41,18 +41,22 @@ public class UserInfo {
         ABSENCE,
         ON_TIME,
         ASK_LEAVE,
-        LATE
+        LATE,
+        WELFARE
     }
 
     @Data
-    private class RehearsalRecord {
-        private String date;
+    public class RehearsalRecord {
+        private Long rehearsalId;
         private ATTEND attendance;
+        private int startPoint;
         private int remainPoint;
+        private Boolean processed;
+        private Long tunningPoint; // tunning point, only used in WELFARE situation
     }
 
     @Data
-    private class Message {
+    public class Message {
         private String event;
         private long timestamp;
         private String content;

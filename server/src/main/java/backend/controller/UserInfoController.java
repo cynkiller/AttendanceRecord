@@ -69,7 +69,7 @@ public class UserInfoController {
         boolean rc = userInfoService.modifyUserInfo(openid, info);
 
         // Exception check
-        if (!rc) {
+        if (rc) {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_NO_USER);
         }
 

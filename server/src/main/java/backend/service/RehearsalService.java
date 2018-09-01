@@ -47,6 +47,12 @@ public class RehearsalService {
         return rehearsalRepository.findFirstByOrderByStartTimestampDesc();
     }
 
+    public Rehearsal getNewInsertedRehearsal() {
+        Query query = new Query();
+        query.with(new Sort(Sort.Direction.DESC, "id"));
+        return mongoTemplate.findOne(query, Rehearsal.class);
+    }
+
     public Rehearsal genNextDefaultRehearsal() {
         LocalDate ld = LocalDate.now();
         ld = ld.with(TemporalAdjusters.next(DayOfWeek.SATURDAY)); // Next Saturday
@@ -112,8 +118,13 @@ public class RehearsalService {
         Rehearsal info = mongoTemplate.findAndModify(query, update, Rehearsal.class);
         if (info == null) {
             // old object not found
-            return false;
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    public Rehearsal getRehearsalById(Long id) {
+        Query query = new Query(Criteria.where("id").is(id));
+        return mongoTemplate.findOne(query, Rehearsal.class);
     }
 }
