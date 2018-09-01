@@ -81,7 +81,7 @@ public class UserInfoController {
         return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);   
     }
 
-    private String _punchin(String openid, Long rehearsalId, UserInfo.ATTEND status)
+    private String _punchin(String openid, Long rehearsalId, UserInfo.ATTEND status, Long curr_ts)
     {
         UserInfo user = userInfoService.getAllRecordByOpenid(openid);
         List<UserInfo.RehearsalRecord> records = user.getRecord();
@@ -98,6 +98,7 @@ public class UserInfoController {
         }
         JSONObject update = new JSONObject();
         update.put("status", status);
+        update.put("punchTime", curr_ts);
         if (userInfoService.modifyRecord(openid, rehearsalId, update)) {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
         }
@@ -128,10 +129,10 @@ public class UserInfoController {
                 return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_PUNCHIN_TIME_PASSED);
             } else if ( curr_ts > start_ts && curr_ts <= end_ts) {
                 // late
-                return _punchin(openid, rehearsalId, UserInfo.ATTEND.LATE);
+                return _punchin(openid, rehearsalId, UserInfo.ATTEND.LATE, curr_ts);
             } else if ( curr_ts > start_ts - StaticInfo.DEFAULT_PUNCHIN_TIME && curr_ts <= start_ts ) {
                 // on time
-                return _punchin(openid, rehearsalId, UserInfo.ATTEND.ON_TIME);
+                return _punchin(openid, rehearsalId, UserInfo.ATTEND.ON_TIME, curr_ts);
             }
 
             return null;

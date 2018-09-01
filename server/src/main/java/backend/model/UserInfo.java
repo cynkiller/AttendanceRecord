@@ -49,6 +49,7 @@ public class UserInfo {
     public class RehearsalRecord {
         private Long rehearsalId;
         private ATTEND attendance;
+        private Long punchTime;
         private int startPoint;
         private int remainPoint;
         private Boolean processed;
