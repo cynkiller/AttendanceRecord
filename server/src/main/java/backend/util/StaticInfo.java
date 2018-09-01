@@ -17,6 +17,9 @@ public class StaticInfo {
         SERVER_ADDRESS_EXIST,
         SERVER_ADDRESS_NOT_EXIST,
         SERVER_REHEARSAL_UPDATE_FAIL,
+        SERVER_REHEARSAL_NOT_STARTED,
+        SERVER_PUNCHIN_TIME_PASSED,
+        SERVER_UPDATE_REHEARSAL_STATUS_FAILED,
         SERVER_INTERNAL_ERROR
     }
     public static String FORMAT_STATUS = "{ status: %s }";
@@ -35,4 +38,5 @@ public class StaticInfo {
         }
     };
     public static Integer DEFAULT_REMAIN_POINT = 99999;
+    public static int DEFAULT_PUNCHIN_TIME = 30 * 60; // punch in started 30 minutes before rehearsal started
 }

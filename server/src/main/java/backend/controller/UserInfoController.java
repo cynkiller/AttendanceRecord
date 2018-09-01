@@ -9,17 +9,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 //import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestHeader;
 import backend.service.UserInfoService;
+import backend.service.RehearsalService;
 import backend.service.SessionService;
 import backend.util.Debug;
 import backend.util.StaticInfo;
 import backend.util.Utility;
 import backend.model.UserInfo;
+import backend.model.Rehearsal;
 import java.util.List;
 
 @RestController
 public class UserInfoController {
     @Autowired
     private UserInfoService userInfoService;
+
+    @Autowired
+    private RehearsalService rehearsalService;
 
     @Autowired
     private SessionService sessionService;
@@ -74,5 +79,65 @@ public class UserInfoController {
         }
 
         return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);   
+    }
+
+    private String _punchin(String openid, Long rehearsalId, UserInfo.ATTEND status)
+    {
+        UserInfo user = userInfoService.getAllRecordByOpenid(openid);
+        List<UserInfo.RehearsalRecord> records = user.getRecord();
+        if (records == null     ||
+            records.isEmpty()   ||
+            records.get(records.size() - 1).getRehearsalId() != rehearsalId)
+        {
+            if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId)) {
+                Debug.Log(openid + " record not inserted.");
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
+            } else {
+                Debug.Log(openid + " record inserted.");
+            }
+        }
+        JSONObject update = new JSONObject();
+        update.put("status", status);
+        if (userInfoService.modifyRecord(openid, rehearsalId, update)) {
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
+        }
+        return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, status.toString());
+    }
+
+    @RequestMapping(value = "/punchIn", method = RequestMethod.POST, produces = "application/json")
+    public String punchIn( @RequestHeader("thirdSessionKey") String sessionKey) {
+        Debug.Log("Enter punchIn");
+
+        try {
+            // Check if session is valid, Get openid from session
+            String openid = sessionService.getValidOpenid(sessionKey);
+            if (openid == null) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+            }
+
+            Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
+            Long rehearsalId = lastRehearsal.getId();
+            
+            // check if the latest rehearsal is outdated
+            Long curr_ts = System.currentTimeMillis();
+            Long start_ts = lastRehearsal.getStartTimestamp();
+            Long end_ts = lastRehearsal.getEndTimestamp();
+            if ( curr_ts < start_ts - StaticInfo.DEFAULT_PUNCHIN_TIME) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_REHEARSAL_NOT_STARTED);
+            } else if ( curr_ts > end_ts) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_PUNCHIN_TIME_PASSED);
+            } else if ( curr_ts > start_ts && curr_ts <= end_ts) {
+                // late
+                return _punchin(openid, rehearsalId, UserInfo.ATTEND.LATE);
+            } else if ( curr_ts > start_ts - StaticInfo.DEFAULT_PUNCHIN_TIME && curr_ts <= start_ts ) {
+                // on time
+                return _punchin(openid, rehearsalId, UserInfo.ATTEND.ON_TIME);
+            }
+
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
+        }
     }
 }
