@@ -86,7 +86,61 @@ Page({
         }
       }
     })
+
   },
+
+  checkPunchStatusCallback: function(data, callback, obj) {
+    util.info("enter checkPunchStatusCallback")
+    if (!data.status) {
+      util.info("Remote backend problem. Failed to change userinfo.")
+      obj.setData({
+        updatefail: true,
+        failmsg: "无法连接服务器。。更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "SERVER_SESSION_EXPIRED") {
+      util.info("Login session expired.")
+      app.loginReady = false;
+      obj.setData({
+        updatefail: true,
+        failmsg: "重新登陆中。。"
+      })
+      // relogin
+      req.weixinUserLogin(app, true, function (obj) {
+        obj.setData({ updatefail: false })
+      }, obj)
+    } else if (data.status == "SERVER_INTERNAL_ERROR") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "程序出了个bug！0.0"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "GENERAL_OK") {
+      util.info("Update successful.")
+      if (data.data == "PUNCHED") {
+        obj.setData({
+          disableSignin: true,
+          signined: true
+        })
+        wx.showToast({
+          title: '已签到',
+        })
+      }
+    }
+  },
+
+  checkPunchStatus: function() {
+    // check if already signined
+    req.getRequest("/queryPunchStatus", this.checkPunchStatusCallback, null, this)
+  },  
 
   showpage: function() {
     util.info("showpage")
@@ -116,12 +170,13 @@ Page({
         // Refresh location every 60 seconds
         this.data.interval = setInterval(this.onShowOperation, 60000);
       }
+      this.checkPunchStatus()
     }
   },
 
   rehearsalInfoCallback: function(obj) {
-    this.data.markers[0].longitude = app.rehearsalInfo.longitude;
-    this.data.markers[0].latitude = app.rehearsalInfo.latitude;
+    this.data.markers[0].longitude = app.rehearsalInfo.address.longtitude;
+    this.data.markers[0].latitude = app.rehearsalInfo.address.latitude;
     this.data.includePoints[0].longitude = app.rehearsalInfo.address.longtitude;
     this.data.includePoints[0].latitude = app.rehearsalInfo.address.latitude;
     this.setData({
@@ -140,7 +195,8 @@ Page({
       this.data.includePoints[1].longitude);
     util.debug("distance:", distance)
     var remain = rehearsal.getRemainTime(this);
-    if (rehearsal.isValidSigninTime(this) && this.data.signined == false && distance <= 10) {
+    //if (rehearsal.isValidSigninTime(this) && this.data.signined == false && distance <= 10) {
+    if (rehearsal.isValidSigninTime(this) && this.data.signined == false) { // mock distance valid
       remain = (remain / 1000 / 60 / 60).toFixed(2);
       this.setData({
         disableSignin: false,
@@ -221,17 +277,109 @@ Page({
   /*********************
    * Customized functions
    *********************/
-  signin: function() {
-    // TBD
-    // 检查是否迟到
-    rehearsal.isValidSigninTime(this)
+
+  signinSuccessCallback: function(obj, info) {
     // 更新后台信息
-    wx.showToast({
-      title: '打卡成功',
-    })
-    this.setData({
+    util.debug(info)
+    if (info == "ON_TIME") {
+      wx.showToast({
+        title: '准时签到！',
+      })
+    } else if (info == "LATE") {
+      wx.showToast({
+        title: '迟到!',
+      })
+    }
+    obj.setData({
       disableSignin: true,
       signined: true
     })
+  },
+
+  signinCallback: function(data, callback, obj) {
+    util.info("enter signinCallback")
+    if (!data.status) {
+      util.info("Remote backend problem. Failed to change userinfo.")
+      obj.setData({
+        updatefail: true,
+        failmsg: "无法连接服务器。。更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "SERVER_SESSION_EXPIRED") {
+      util.info("Login session expired.")
+      app.loginReady = false;
+      obj.setData({
+        updatefail: true,
+        failmsg: "重新登陆中。。"
+      })
+      // relogin
+      req.weixinUserLogin(app, true, function (obj) {
+        obj.setData({ updatefail: false })
+      }, obj)
+    } else if (data.status == "SERVER_REHEARSAL_NOT_STARTED") {
+      util.info("排练打卡时间还没到")
+      obj.setData({
+        updatefail: true,
+        failmsg: "排练打卡时间还没到"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "SERVER_PUNCHIN_TIME_PASSED") {
+      util.info("打卡时间已经过了0.0")
+      obj.setData({
+        updatefail: true,
+        failmsg: "打卡时间已经过了0.0"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)      
+    } else if (data.status == "SERVER_UPDATE_REHEARSAL_STATUS_FAILED") {
+      util.info("打卡失败")
+      obj.setData({
+        updatefail: true,
+        failmsg: "打卡失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)      
+    } else if (data.status == "SERVER_INTERNAL_ERROR") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "程序出了个bug！0.0"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "GENERAL_OK") {
+      util.info("Update successful.")
+      if (callback) callback(obj, data.data)
+    }
+  },
+
+  signin: function() {
+    util.getCurrentPosition(this);
+    var distance = util.getGpsDisance(
+      this.data.includePoints[0].latitude,
+      this.data.includePoints[0].longitude,
+      this.data.includePoints[1].latitude,
+      this.data.includePoints[1].longitude);
+    util.debug("distance:", distance)
+    //if (rehearsal.isValidSigninTime(this) && distance <= 10) {
+    if (rehearsal.isValidSigninTime(this)) { // mock distance valid
+      req.postRequest("/punchIn", {}, this.signinCallback, this.signinSuccessCallback, this)
+    }
   }
 })

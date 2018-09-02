@@ -38,5 +38,5 @@ public class StaticInfo {
         }
     };
     public static Integer DEFAULT_REMAIN_POINT = 99999;
-    public static int DEFAULT_PUNCHIN_TIME = 30 * 60; // punch in started 30 minutes before rehearsal started
+    public static int DEFAULT_PUNCHIN_TIME = 30 * 60 * 1000; // punch in started 30 minutes before rehearsal started
 }

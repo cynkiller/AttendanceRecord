@@ -97,7 +97,7 @@ public class UserInfoController {
             }
         }
         JSONObject update = new JSONObject();
-        update.put("status", status);
+        update.put("attendance", status);
         update.put("punchTime", curr_ts);
         if (userInfoService.modifyRecord(openid, rehearsalId, update)) {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
@@ -141,4 +141,30 @@ public class UserInfoController {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
         }
     }
+
+    @RequestMapping(value = "/queryPunchStatus", method = RequestMethod.GET, produces = "application/json")
+    public String queryPunchStatus( @RequestHeader("thirdSessionKey") String sessionKey) {
+        Debug.Log("Enter queryPunchStatus");
+
+        try {
+            // Check if session is valid, Get openid from session
+            String openid = sessionService.getValidOpenid(sessionKey);
+            if (openid == null) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+            }
+
+            Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
+            Long rehearsalId = lastRehearsal.getId();
+            
+            Boolean attend = userInfoService.getRecordAttendStatus(rehearsalId);
+            if (attend) {
+                return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, "PUNCHED");
+            } else {
+                return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, "NOT_PUNCHED");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
+        }
+    } 
 }

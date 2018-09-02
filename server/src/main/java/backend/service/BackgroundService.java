@@ -40,7 +40,7 @@ public class BackgroundService implements SchedulingConfigurer{
         //BackgroundService bs = new BackgroundService("Set Next Rehearsal Information");
         RehearsalTask rt = new RehearsalTask("RehearsalTask", rehearsalService, userInfoService);
         //taskScheduler.schedule(rt, new CronTrigger("0 13 * * * ?")); // Every day at 13:00
-        taskRegistrar.addCronTask(rt, "0 0 13 * * ?");
+        taskRegistrar.addCronTask(rt, "0 0 * * * ?");
         rt.run();
     }
 }

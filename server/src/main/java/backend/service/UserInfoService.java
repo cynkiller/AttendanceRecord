@@ -81,6 +81,19 @@ public class UserInfoService {
         return users;
     }
 
+    public Boolean getRecordAttendStatus(Long rehearsalId) {
+        Criteria criteria = new Criteria();
+        criteria = criteria.and("record.rehearsalId").is(rehearsalId);
+        criteria = criteria.and("record.punchTime").exists(true);
+        Query query = new Query(criteria);
+        UserInfo user = mongoTemplate.findOne(query, UserInfo.class);
+        if (user != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Boolean modifyRecord(String openid, Long rehearsalId, JSONObject obj) {
         Criteria criteria = new Criteria();
         criteria = criteria.and("openid").is(openid);

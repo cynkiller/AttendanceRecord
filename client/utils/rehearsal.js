@@ -45,8 +45,9 @@ function timestampToTime(ts) {
 }
 
 const isValidSigninTime = obj => {
+  var shifttime = 30 * 60 * 1000; // 30 minutes earlier open for signin
   var ts = timestamps(obj);
-  if (ts['current'] >= ts['start'] && ts['current'] <= ts['end'])
+  if (ts['current'] >= ts['start'] - shifttime && ts['current'] <= ts['end'])
     return true;
   else
     return false;
