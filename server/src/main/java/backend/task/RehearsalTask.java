@@ -44,7 +44,6 @@ public class RehearsalTask implements Runnable {
 
         Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
         Long rehearsalId = lastRehearsal.getId();
-        String rehearsalDate = lastRehearsal.getDate();
 
         for ( UserInfo user: users) {
             String openid = user.getOpenid();
@@ -54,7 +53,7 @@ public class RehearsalTask implements Runnable {
                 records.isEmpty()   ||
                 records.get(records.size() - 1).getRehearsalId() != rehearsalId)
             {
-                if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId, rehearsalDate)) {
+                if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId)) {
                     Debug.Log(openid + " record not inserted.");
                 } else {
                     Debug.Log(openid + " record inserted.");
@@ -145,7 +144,6 @@ public class RehearsalTask implements Runnable {
 
         recentRehearsal = rehearsalService.getNewInsertedRehearsal();
         Long rehearsalId = recentRehearsal.getId();
-        String rehearsalDate = recentRehearsal.getDate();
 
         // get all users
         List<UserInfo> users = userInfoService.getAllUserOpenid();
@@ -153,7 +151,7 @@ public class RehearsalTask implements Runnable {
         // insert new record for each user
         for (UserInfo user: users) {
             String openid = user.getOpenid();
-            rc = userInfoService.insertNewRehearsalRecord(openid, rehearsalId, rehearsalDate);
+            rc = userInfoService.insertNewRehearsalRecord(openid, rehearsalId);
             if (rc) {
                 Debug.Log(openid + " record not inserted.");
             } else {

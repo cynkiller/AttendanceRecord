@@ -87,7 +87,7 @@ public class UserInfoController {
         return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);   
     }
 
-    private String _punchin(String openid, Long rehearsalId, String rehearsalDate, UserInfo.ATTEND status, Long curr_ts)
+    private String _punchin(String openid, Long rehearsalId, UserInfo.ATTEND status, Long curr_ts)
     {
         UserInfo user = userInfoService.getAllRecordByOpenid(openid);
         List<UserInfo.RehearsalRecord> records = user.getRecord();
@@ -95,7 +95,7 @@ public class UserInfoController {
             records.isEmpty()   ||
             records.get(records.size() - 1).getRehearsalId() != rehearsalId)
         {
-            if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId, rehearsalDate)) {
+            if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId)) {
                 Debug.Log(openid + " record not inserted.");
                 return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
             } else {
@@ -124,7 +124,6 @@ public class UserInfoController {
 
             Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
             Long rehearsalId = lastRehearsal.getId();
-            String rehearsalDate = lastRehearsal.getDate();
             
             // check if the latest rehearsal is outdated
             Long curr_ts = System.currentTimeMillis();
@@ -136,10 +135,10 @@ public class UserInfoController {
                 return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_PUNCHIN_TIME_PASSED);
             } else if ( curr_ts > start_ts && curr_ts <= end_ts) {
                 // late
-                return _punchin(openid, rehearsalId, rehearsalDate, UserInfo.ATTEND.LATE, curr_ts);
+                return _punchin(openid, rehearsalId, UserInfo.ATTEND.LATE, curr_ts);
             } else if ( curr_ts > start_ts - StaticInfo.DEFAULT_PUNCHIN_TIME && curr_ts <= start_ts ) {
                 // on time
-                return _punchin(openid, rehearsalId, rehearsalDate, UserInfo.ATTEND.ON_TIME, curr_ts);
+                return _punchin(openid, rehearsalId, UserInfo.ATTEND.ON_TIME, curr_ts);
             }
 
             return null;
@@ -228,12 +227,15 @@ public class UserInfoController {
                 return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
             }
             
+            List<Rehearsal> rehearsals = rehearsalService.getAllRehearsal();
             UserInfo user = userInfoService.getAllRecordByOpenid(openid);
             List<UserInfo.RehearsalRecord> records = user.getRecord();
             ObjectMapper mapper = new ObjectMapper();
-            String outString = mapper.writeValueAsString(records);
+            String recordstr = mapper.writeValueAsString(records);
+            mapper = new ObjectMapper();
+            String rehearsalstr = mapper.writeValueAsString(rehearsals);
             if (records != null) {
-                return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, outString);
+                return Utility.retmsg("{ status: %s, data: %s, rehearsal: %s }", StaticInfo.StatusCode.GENERAL_OK, recordstr, rehearsalstr);
             } else {
                 return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, "[]");
             }

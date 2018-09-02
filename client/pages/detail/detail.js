@@ -177,6 +177,7 @@ Page({
       util.info("Update successful.")
       var rehearsalRecord = [];
       var records = data.data;
+      var rehearsals = data.rehearsal;
       for (var i = records.length - 1; i >= 0; i--) {
         if (records[i].remainPoint == 99999) {
           util.debug("Skip ongoing rehearsal record")
@@ -184,7 +185,12 @@ Page({
         }
         var record = {};
         record['remainPoint'] = records[i].remainPoint;
-        record['date'] = records[i].rehearsalDate;
+        for (var j = 0; j < rehearsals.length; j++) {
+          if (rehearsals[j].id == records[i].rehearsalId) {
+            record['date'] = rehearsals[i].date;
+            break;
+          }
+        }
         if (records[i].attendance == 'LATE') {
           record['status'] = "迟到"
         } else if (records[i].attendance == 'ASK_LEAVE') {

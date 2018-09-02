@@ -120,7 +120,7 @@ public class UserInfoService {
         //Update update = new Update().set("record.$.role", newRole);
     }
 
-    public Boolean insertNewRehearsalRecord(String openid, Long rehearsalId, String rehearsalDate) {
+    public Boolean insertNewRehearsalRecord(String openid, Long rehearsalId) {
         Criteria criteria = new Criteria();
         criteria = criteria.and("openid").is(openid);
         Query query = new Query(criteria);
@@ -140,7 +140,6 @@ public class UserInfoService {
 
         UserInfo.RehearsalRecord record = new UserInfo().new RehearsalRecord();
         record.setRehearsalId(rehearsalId);
-        record.setRehearsalDate(rehearsalDate);
         record.setAttendance(UserInfo.ATTEND.ABSENCE); // default absense
         record.setStartPoint(startPoint);
         record.setRemainPoint(StaticInfo.DEFAULT_REMAIN_POINT);

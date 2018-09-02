@@ -127,4 +127,8 @@ public class RehearsalService {
         Query query = new Query(Criteria.where("id").is(id));
         return mongoTemplate.findOne(query, Rehearsal.class);
     }
+
+    public List<Rehearsal> getAllRehearsal() {
+        return rehearsalRepository.findAllByOrderByStartTimestampDesc();
+    }
 }
