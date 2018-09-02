@@ -2,6 +2,7 @@
 <view class="page">
     <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo" class="signin"> 点击登录 </button>
     <block wx:else>
+        <view class="weui-toptips weui-toptips_warn" wx:if="{{updatefail}}">{{failmsg}}</view>
         <view class="weui-cells weui-cells_after-title">
             <view class="weui-cell">
                 <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">

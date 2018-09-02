@@ -1,5 +1,9 @@
 package backend.controller;
 
+import java.util.Date;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -166,5 +170,47 @@ public class UserInfoController {
             e.printStackTrace();
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
         }
-    } 
+    }
+
+    @RequestMapping(value = "/askLeave", method = RequestMethod.POST, produces = "application/json")
+    public String askLeave( @RequestHeader("thirdSessionKey") String sessionKey) {
+        Debug.Log("Enter askLeave");
+
+        try {
+            // Check if session is valid, Get openid from session
+            String openid = sessionService.getValidOpenid(sessionKey);
+            if (openid == null) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+            }
+
+            Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
+            Long rehearsalId = lastRehearsal.getId();
+            
+            // ask leave need to be earlier than then rehearsal date
+            String rehearsalDate = lastRehearsal.getDate();
+            Long curr_ts = System.currentTimeMillis();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar cal = Calendar.getInstance();
+            Date date = sdf.parse(rehearsalDate);
+            cal.setTime(date);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            Long lastest_ts = cal.getTime().getTime();
+            if (curr_ts > lastest_ts) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_ASKLEAVE_TOOLATE);
+            }
+
+            JSONObject update = new JSONObject();
+            update.put("attendance", UserInfo.ATTEND.ASK_LEAVE);
+            if (userInfoService.modifyRecord(openid, rehearsalId, update)) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
+            }
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);
+        } catch ( java.text.ParseException e) {
+            e.printStackTrace();
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
+        }
+    }
 }

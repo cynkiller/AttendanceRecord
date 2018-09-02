@@ -82,9 +82,7 @@ public class UserInfoService {
     }
 
     public Boolean getRecordAttendStatus(Long rehearsalId) {
-        Criteria criteria = new Criteria();
-        criteria = criteria.and("record.rehearsalId").is(rehearsalId);
-        criteria = criteria.and("record.punchTime").exists(true);
+        Criteria criteria = Criteria.where("record").elemMatch(Criteria.where("rehearsalId").is(rehearsalId).and("punchTime").exists(true));
         Query query = new Query(criteria);
         UserInfo user = mongoTemplate.findOne(query, UserInfo.class);
         if (user != null) {
