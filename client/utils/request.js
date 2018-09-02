@@ -126,7 +126,7 @@ function getRequest(_urlalias, func, callback = null, parm = null) {
     method: "GET",
     success: function (res) {
       util.debug(res.data)
-      func(res.data, callback, parm)
+      if (func) func(res.data, callback, parm)
     },
     fail: function (res) {
       util.info("getRequest request failed.")

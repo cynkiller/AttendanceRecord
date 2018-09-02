@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
 import org.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -85,7 +87,7 @@ public class UserInfoController {
         return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.GENERAL_OK);   
     }
 
-    private String _punchin(String openid, Long rehearsalId, UserInfo.ATTEND status, Long curr_ts)
+    private String _punchin(String openid, Long rehearsalId, String rehearsalDate, UserInfo.ATTEND status, Long curr_ts)
     {
         UserInfo user = userInfoService.getAllRecordByOpenid(openid);
         List<UserInfo.RehearsalRecord> records = user.getRecord();
@@ -93,7 +95,7 @@ public class UserInfoController {
             records.isEmpty()   ||
             records.get(records.size() - 1).getRehearsalId() != rehearsalId)
         {
-            if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId)) {
+            if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId, rehearsalDate)) {
                 Debug.Log(openid + " record not inserted.");
                 return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
             } else {
@@ -122,6 +124,7 @@ public class UserInfoController {
 
             Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
             Long rehearsalId = lastRehearsal.getId();
+            String rehearsalDate = lastRehearsal.getDate();
             
             // check if the latest rehearsal is outdated
             Long curr_ts = System.currentTimeMillis();
@@ -133,10 +136,10 @@ public class UserInfoController {
                 return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_PUNCHIN_TIME_PASSED);
             } else if ( curr_ts > start_ts && curr_ts <= end_ts) {
                 // late
-                return _punchin(openid, rehearsalId, UserInfo.ATTEND.LATE, curr_ts);
+                return _punchin(openid, rehearsalId, rehearsalDate, UserInfo.ATTEND.LATE, curr_ts);
             } else if ( curr_ts > start_ts - StaticInfo.DEFAULT_PUNCHIN_TIME && curr_ts <= start_ts ) {
                 // on time
-                return _punchin(openid, rehearsalId, UserInfo.ATTEND.ON_TIME, curr_ts);
+                return _punchin(openid, rehearsalId, rehearsalDate, UserInfo.ATTEND.ON_TIME, curr_ts);
             }
 
             return null;
@@ -160,7 +163,7 @@ public class UserInfoController {
             Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
             Long rehearsalId = lastRehearsal.getId();
             
-            Boolean attend = userInfoService.getRecordAttendStatus(rehearsalId);
+            Boolean attend = userInfoService.getRecordAttendStatus(openid, rehearsalId);
             if (attend) {
                 return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, "PUNCHED");
             } else {
@@ -213,4 +216,30 @@ public class UserInfoController {
             return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
         }
     }
+
+    @RequestMapping(value = "/queryRecords", method = RequestMethod.GET, produces = "application/json")
+    public String queryRecords( @RequestHeader("thirdSessionKey") String sessionKey) {
+        Debug.Log("Enter queryRecords");
+
+        try {
+            // Check if session is valid, Get openid from session
+            String openid = sessionService.getValidOpenid(sessionKey);
+            if (openid == null) {
+                return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+            }
+            
+            UserInfo user = userInfoService.getAllRecordByOpenid(openid);
+            List<UserInfo.RehearsalRecord> records = user.getRecord();
+            ObjectMapper mapper = new ObjectMapper();
+            String outString = mapper.writeValueAsString(records);
+            if (records != null) {
+                return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, outString);
+            } else {
+                return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, "[]");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_INTERNAL_ERROR);
+        }
+    }    
 }

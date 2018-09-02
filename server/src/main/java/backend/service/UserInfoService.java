@@ -81,8 +81,8 @@ public class UserInfoService {
         return users;
     }
 
-    public Boolean getRecordAttendStatus(Long rehearsalId) {
-        Criteria criteria = Criteria.where("record").elemMatch(Criteria.where("rehearsalId").is(rehearsalId).and("punchTime").exists(true));
+    public Boolean getRecordAttendStatus(String openid, Long rehearsalId) {
+        Criteria criteria = Criteria.where("record").elemMatch(Criteria.where("rehearsalId").is(rehearsalId).and("punchTime").exists(true)).and("openid").is(openid);
         Query query = new Query(criteria);
         UserInfo user = mongoTemplate.findOne(query, UserInfo.class);
         if (user != null) {
@@ -120,7 +120,7 @@ public class UserInfoService {
         //Update update = new Update().set("record.$.role", newRole);
     }
 
-    public Boolean insertNewRehearsalRecord(String openid, Long rehearsalId) {
+    public Boolean insertNewRehearsalRecord(String openid, Long rehearsalId, String rehearsalDate) {
         Criteria criteria = new Criteria();
         criteria = criteria.and("openid").is(openid);
         Query query = new Query(criteria);
@@ -140,6 +140,7 @@ public class UserInfoService {
 
         UserInfo.RehearsalRecord record = new UserInfo().new RehearsalRecord();
         record.setRehearsalId(rehearsalId);
+        record.setRehearsalDate(rehearsalDate);
         record.setAttendance(UserInfo.ATTEND.ABSENCE); // default absense
         record.setStartPoint(startPoint);
         record.setRemainPoint(StaticInfo.DEFAULT_REMAIN_POINT);

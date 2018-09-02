@@ -48,6 +48,7 @@ public class UserInfo {
     @Data
     public class RehearsalRecord {
         private Long rehearsalId;
+        private String rehearsalDate;
         private ATTEND attendance;
         private Long punchTime;
         private int startPoint;

@@ -1,6 +1,7 @@
 // pages/detail/detail.js
 const app = getApp()
 const util = require('../../utils/util.js')
+const request = require('../../utils/request.js')
 
 Page({
 
@@ -115,10 +116,90 @@ Page({
    */
   onLoad: function (options) {
     util.onloadCheck(app, this)
+    var maxIdx = 6
     this.setData({
       rehearsalRecord: this.data.rehearsalRecord,
       maxIdx: maxIdx
     })
+    if (app.backendUser) {
+      this.setUserInfo(this, app.backendUser)
+    } else {
+      request.getRequest("/queryUserInfo", request.getUserInfo, this.setUserInfo, this);
+    }
+    request.getRequest('/queryRecords', this.queryRecordsCallback, null, this);
+  },
+
+  setUserInfo: function (obj, data) {
+    util.info("enter setUserInfo")
+    if (data.hasOwnProperty("data")) data = data.data;
+    obj.setData({
+      point: data.point,
+      nickName: data.nickName,
+      authority: data.authority
+    })
+  },
+
+  queryRecordsCallback: function(data, callback, obj) {
+    util.info("enter queryRecordsCallback")
+    if (!data.status) {
+      util.info("Remote backend problem. Failed to change userinfo.")
+      obj.setData({
+        updatefail: true,
+        failmsg: "无法连接服务器。。更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "SERVER_SESSION_EXPIRED") {
+      util.info("Login session expired.")
+      app.loginReady = false;
+      obj.setData({
+        updatefail: true,
+        failmsg: "重新登陆中。。"
+      })
+      // relogin
+      request.weixinUserLogin(app, true, function (obj) {
+        obj.setData({ updatefail: false })
+      }, obj)
+    } else if (data.status == "SERVER_INTERNAL_ERROR") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "程序出了个bug！0.0"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "GENERAL_OK") {
+      util.info("Update successful.")
+      var rehearsalRecord = [];
+      var records = data.data;
+      for (var i = records.length - 1; i >= 0; i--) {
+        if (records[i].remainPoint == 99999) {
+          util.debug("Skip ongoing rehearsal record")
+          continue
+        }
+        var record = {};
+        record['remainPoint'] = records[i].remainPoint;
+        record['date'] = records[i].rehearsalDate;
+        if (records[i].attendance == 'LATE') {
+          record['status'] = "迟到"
+        } else if (records[i].attendance == 'ASK_LEAVE') {
+          record['status'] = "请假"
+        } else if (records[i].attendance == 'ABSENCE') {
+          record['status'] == "缺席"
+        } else if (records[i].attendance == 'ON_TIME') {
+          record['status'] == "准时"
+        }
+        rehearsalRecord.push(record)
+      }
+      obj.setData({
+        rehearsalRecord: rehearsalRecord
+      })
+    }
   },
 
   /**
