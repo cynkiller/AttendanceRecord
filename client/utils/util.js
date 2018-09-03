@@ -1,3 +1,5 @@
+const geo = require("geography.js");
+
 const formatTime = date => {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
@@ -65,11 +67,21 @@ function toRad(d) { return d * Math.PI / 180; }
 
 function getGpsDisance(lat1, lng1, lat2, lng2) {
   console.log(lat1, lng1, lat2, lng2)
+  var gps1 = geo.MarsToGps(lat1, lng1)
+  var gps2 = geo.MarsToGps(lat2, lng2)
+  /*
+  var gps1 = {}
+  var gps2 = {}
+  gps1['lat'] = lat1;
+  gps1['lon'] = lng1;
+  gps2['lat'] = lat2;
+  gps2['lon'] = lng2;
+  */
   var dis = 0;
-  var radLat1 = toRad(lat1);
-  var radLat2 = toRad(lat2);
+  var radLat1 = toRad(gps1['lat']); //toRad(lat1);
+  var radLat2 = toRad(gps2['lat']); //toRad(lat2);
   var deltaLat = radLat1 - radLat2;
-  var deltaLng = toRad(lng1) - toRad(lng2);
+  var deltaLng = toRad(gps1['lon']) - toRad(gps2['lon']); //toRad(lng1) - toRad(lng2);
   var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)));
   return dis * 6378137;
 }
