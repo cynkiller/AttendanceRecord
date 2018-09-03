@@ -49,8 +49,8 @@ function MarsToGps(lat, lon)
   dLon = (dLon * 180.0) / (a / sqrtMagic * Math.cos(radLat) * pi);
   var mgLat = lat + dLat;
   var mgLon = lon + dLon;
-  gps['lat'] = mgLat;
-  gps['lon'] = mgLon;
+  gps['lat'] = 2 * lat - mgLat;
+  gps['lon'] = 2 * lon - mgLon;
   return gps;
 }
 
