@@ -187,7 +187,7 @@ Page({
         record['remainPoint'] = records[i].remainPoint;
         for (var j = 0; j < rehearsals.length; j++) {
           if (rehearsals[j].id == records[i].rehearsalId) {
-            record['date'] = rehearsals[i].date;
+            record['date'] = rehearsals[j].date;
             break;
           }
         }

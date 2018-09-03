@@ -201,6 +201,20 @@ public class UserInfoController {
                 return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_ASKLEAVE_TOOLATE);
             }
 
+            UserInfo user = userInfoService.getAllRecordByOpenid(openid);
+            List<UserInfo.RehearsalRecord> records = user.getRecord();
+            if (records == null     ||
+                records.isEmpty()   ||
+                records.get(records.size() - 1).getRehearsalId() != rehearsalId)
+            {
+                if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId)) {
+                    Debug.Log(openid + " record not inserted.");
+                    return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_UPDATE_REHEARSAL_STATUS_FAILED);
+                } else {
+                    Debug.Log(openid + " record inserted.");
+                }
+            }
+
             JSONObject update = new JSONObject();
             update.put("attendance", UserInfo.ATTEND.ASK_LEAVE);
             if (userInfoService.modifyRecord(openid, rehearsalId, update)) {

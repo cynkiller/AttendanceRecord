@@ -21,7 +21,8 @@ public class UserInfo {
         MH1,
         MH2,
         ML1,
-        ML2
+        ML2,
+        INVALID
     }
 
     public enum LEADER {
@@ -86,6 +87,7 @@ public class UserInfo {
         this.state = StaticInfo.DEFAULT_STATE;
         this.point = StaticInfo.DEFAULT_POINT;
         this.authority = StaticInfo.DEFAULT_AUTH;
+        this.voicePart = VOICEPART.INVALID;
     }
 
     @Override

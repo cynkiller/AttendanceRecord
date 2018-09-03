@@ -90,6 +90,17 @@ Page({
       request.weixinUserLogin(app, true, function (obj) {
         obj.setData({ updatefail: false })
       }, obj)
+    } else if (data.status == "SERVER_UPDATE_REHEARSAL_STATUS_FAILED") {
+      util.info("后台更新排练信息失败")
+      obj.setData({
+        updatefail: true,
+        failmsg: "后台更新排练信息失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
     } else if (data.status == "CLIENT_ASKLEAVE_TOOLATE") {
       wx.showToast({
         title: '不能请假了',
