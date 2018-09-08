@@ -168,7 +168,7 @@ Page({
       this.onShowOperation();
       if(this.data.interval !== undefined) {
         // Refresh location every 60 seconds
-        this.data.interval = setInterval(this.onShowOperation, 60000);
+        this.data.interval = setInterval(this.onShowOperation, 5000);
       }
       this.checkPunchStatus()
     }
@@ -195,8 +195,8 @@ Page({
       this.data.includePoints[1].longitude);
     util.debug("distance:", distance)
     var remain = rehearsal.getRemainTime(this);
-    //if (rehearsal.isValidSigninTime(this) && this.data.signined == false && distance <= 10) {
-    if (rehearsal.isValidSigninTime(this) && this.data.signined == false) { // mock distance valid
+    if (rehearsal.isValidSigninTime(this) && this.data.signined == false && distance <= 20) {
+    //if (rehearsal.isValidSigninTime(this) && this.data.signined == false) { // mock distance valid
       remain = (remain / 1000 / 60 / 60).toFixed(2);
       this.setData({
         disableSignin: false,
@@ -210,15 +210,19 @@ Page({
         remainHours: remain
       })
       if (!rehearsal.isValidSigninTime(this)) {
+        util.debug('不在打卡时间内')
+        /*
         wx.showToast({
           title: '不在打卡时间内',
           duration: 2000
-        })
-      } else if (distance > 10) {
+        })*/
+      } else if (distance > 20) {
+        util.debug('不在打卡距离内')
+        /*
         wx.showToast({
           title: '不在打卡距离内',
           duration: 2000
-        })
+        }) */
       }
     }
   },
@@ -377,8 +381,8 @@ Page({
       this.data.includePoints[1].latitude,
       this.data.includePoints[1].longitude);
     util.debug("distance:", distance)
-    //if (rehearsal.isValidSigninTime(this) && distance <= 10) {
-    if (rehearsal.isValidSigninTime(this)) { // mock distance valid
+    if (rehearsal.isValidSigninTime(this) && distance <= 20) {
+    //if (rehearsal.isValidSigninTime(this)) { // mock distance valid
       req.postRequest("/punchIn", {}, this.signinCallback, this.signinSuccessCallback, this)
     }
   }

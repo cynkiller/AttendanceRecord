@@ -23,9 +23,10 @@ const toReadableDate = date => {
 }
 
 const getCurrentPosition = obj => {
+  /*
   wx.showLoading({
     title: '获取当前地理位置...'
-  })
+  })*/
   wx.getLocation({
     type: 'gcj02', //'wgs84' return gps position,
     success: function (res) {

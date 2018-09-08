@@ -49,17 +49,6 @@ public class RehearsalTask implements Runnable {
             String openid = user.getOpenid();
             user = userInfoService.getAllRecordByOpenid( openid );
             List<UserInfo.RehearsalRecord> records = user.getRecord();
-            if (records == null     ||
-                records.isEmpty()   ||
-                records.get(records.size() - 1).getRehearsalId() != rehearsalId)
-            {
-                if(userInfoService.insertNewRehearsalRecord(openid, rehearsalId)) {
-                    Debug.Log(openid + " record not inserted.");
-                } else {
-                    Debug.Log(openid + " record inserted.");
-                }
-                continue;
-            }
 
             for ( UserInfo.RehearsalRecord record: records) {
                 // check all missed handled records

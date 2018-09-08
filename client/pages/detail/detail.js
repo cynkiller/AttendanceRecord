@@ -21,7 +21,8 @@ Page({
       '缺席': 12
     },
     point: 30,
-    rehearsalRecord: [
+    rehearsalRecord: [],
+    /*
       {
         date: "2018-06-02",
         status: '请假',
@@ -108,6 +109,7 @@ Page({
         remainPoint: 30
       }
     ],
+    */
     maxIdx: 6
   },
 
