@@ -117,7 +117,8 @@ public class RehearsalTask implements Runnable {
                 if (rc) {
                     Debug.Log("failed to update rehearsal state.");
                 } else {
-                    Debug.Log(recentRehearsal.getDate() + "Rehearsal state updated to PASSED.");
+                    Debug.Log(recentRehearsal.getDate() + " Rehearsal state updated to PASSED.");
+                    checkPassedRehearsal();
                 }
             }
         }
