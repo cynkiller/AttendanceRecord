@@ -198,9 +198,9 @@ Page({
         } else if (records[i].attendance == 'ASK_LEAVE') {
           record['status'] = "请假"
         } else if (records[i].attendance == 'ABSENCE') {
-          record['status'] == "缺席"
+          record['status'] = "缺席"
         } else if (records[i].attendance == 'ON_TIME') {
-          record['status'] == "准时"
+          record['status'] = "准时"
         }
         rehearsalRecord.push(record)
       }
