@@ -122,7 +122,7 @@ Page({
     } else if (data.status == "SERVER_ADDRESS_NOT_EXIST") {
       obj.setData({
         updatefail: true,
-        failmsg: "地址不存在。。"
+        failmsg: "地址不存在或已被占用。。"
       })
       setTimeout(function (obj) {
         obj.setData({

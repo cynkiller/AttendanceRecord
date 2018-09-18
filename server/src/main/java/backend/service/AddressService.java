@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.domain.Sort;
 
 import backend.repo.AddressRepository;
+import backend.service.RehearsalService;
 import backend.util.Debug;
 import backend.model.Address;
 
@@ -22,6 +23,9 @@ public class AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private RehearsalService rehearsalService;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -67,8 +71,13 @@ public class AddressService {
     }
 
     public int removeAddress(double _long, double _lati) {
-        List<Address> removedAddr = addressRepository.removeByLongtitudeAndLatitude(_long, _lati);
-        return removedAddr.size();
+        Address addr = addressRepository.findFirstByLongtitudeAndLatitude(_long, _lati);
+        Boolean used = rehearsalService.addressUsed(addr.getId());
+        if (!used) {
+            List<Address> removedAddr = addressRepository.removeByLongtitudeAndLatitude(_long, _lati);
+            return removedAddr.size();
+        }
+        return 0;
     }
 
     public List<Address> queryAddress() {

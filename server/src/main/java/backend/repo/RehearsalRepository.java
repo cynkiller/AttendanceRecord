@@ -8,6 +8,7 @@ public interface RehearsalRepository extends MongoRepository<Rehearsal, Long> {
     Rehearsal findFirstByDate(String date);
     Rehearsal findFirstByOrderByStartTimestampDesc();
     Rehearsal findFirstByOrderById();
+    Rehearsal findFirstByAddrIdOrderByAddrId(long addrId);
     List<Rehearsal> findAllByOrderByStartTimestampDesc();
     long countByDate(String date);
     Rehearsal save(Rehearsal r);

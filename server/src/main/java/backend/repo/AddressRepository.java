@@ -9,6 +9,7 @@ public interface AddressRepository extends MongoRepository<Address, Long> {
     //Address findOneByOrderByIdDesc();
     List<Address> findAllByOrderByIdDesc();
     List<Address> removeByLongtitudeAndLatitude(double _long, double _lati);
+    Address findFirstByLongtitudeAndLatitude(double _long, double _lati);
     int countById(Long id);
     int countByLongtitude(double _long);
     int countByLatitude(double _lati);

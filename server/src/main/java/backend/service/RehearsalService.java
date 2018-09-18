@@ -131,4 +131,13 @@ public class RehearsalService {
     public List<Rehearsal> getAllRehearsal() {
         return rehearsalRepository.findAllByOrderByStartTimestampDesc();
     }
+
+    public Boolean addressUsed(long addrId) {
+        Rehearsal rh = rehearsalRepository.findFirstByAddrIdOrderByAddrId(addrId);
+        if ( rh == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
