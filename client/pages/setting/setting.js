@@ -17,7 +17,15 @@ Page({
       modifyPoint: false
     },
 
+    authorityLevel: {
+      'MEMBER': [0],
+      'ADMIN': [1, 2]
+    },
+
+    administrators : [],
+    adminCandidate : [],
     // mock data
+    /*
     administrators : [
       { 
         id: 1,
@@ -44,6 +52,7 @@ Page({
         checked: false
       }
     ],
+    */
     strategies: [],
     addressBook: {}
   },
@@ -73,6 +82,76 @@ Page({
       strategies: strtgs,
       strategyIndex: 30
     })
+
+    //test
+    request.getRequest("/queryAllUserInfo", this.queryAllUserInfoCallback, this.setAdministrators, this);
+  },
+
+  setAdministrators: function(data, obj) {
+    util.info("enter setAdministrators")
+    if (data.hasOwnProperty("data")) data = data.data;
+    for (var i = 0, len = data.length; i < len; ++i) {
+      var authority = data[i].authority;
+      var administrators = obj.data.administrators;
+      var adminCandidate = obj.data.adminCandidate;
+      if (obj.data.authorityLevel['ADMIN'].includes(authority)) {
+        administrators.push(data)
+      } else if (obj.data.authorityLevel['MEMBER'].includes(authority)) {
+        adminCandidate.push(data)
+      }
+    }
+    util.debug("administrators: ", administrators)
+    util.debug("adminCandidate: ", adminCandidate)
+  },
+
+  queryAllUserInfoCallback: function(data, callback, obj) {
+    util.info("enter queryAllUserInfoCallback")
+    if (!data.status) {
+      util.info("Remote backend problem. Failed to change userinfo.")
+      obj.setData({
+        updatefail: true,
+        failmsg: "无法连接服务器。。更新失败"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "SERVER_SESSION_EXPIRED") {
+      util.info("Login session expired.")
+      app.loginReady = false;
+      obj.setData({
+        updatefail: true,
+        failmsg: "重新登陆中。。"
+      })
+      // relogin
+      request.weixinUserLogin(app, true, function (obj) {
+        obj.setData({ updatefail: false })
+      }, obj)
+    } else if (data.status == "CLIENT_NOT_AUTHORIZED") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "Oops。。没有权限哦>-<"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "SERVER_INTERNAL_ERROR") {
+      obj.setData({
+        updatefail: true,
+        failmsg: "程序出了个bug！0.0"
+      })
+      setTimeout(function (obj) {
+        obj.setData({
+          updatefail: false
+        })
+      }, 3000, obj)
+    } else if (data.status == "GENERAL_OK") {
+      util.info("Update successful.")
+      if (callback) callback(data, obj)
+    }
   },
 
   addressCallback: function(data, callback, obj) {

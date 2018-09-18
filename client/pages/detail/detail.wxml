@@ -40,8 +40,12 @@
             <view class="weui-cell__bd" style="padding-left: 10px;"> 剩余积分： {{info.remainPoint}} </view>
         </view>
         <view class="weui-cell weui-cell_link">
+          <view wx:if="{{rehearsalRecord.length > maxIdx}}">
             <view class="weui-cell__bd" style="padding-left: 10px;" bindtap="loadMore"> 显示更多记录 </view>
+          </view>
+          <view wx:if="{{maxIdx > 6}}">
             <view class="weui-cell__hd" style="padding-left: 10px;" bindtap="fold"> 收起 </view>
+          </view>
         </view>
     </view>
 </view>

@@ -50,6 +50,26 @@ public class UserInfoController {
         return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, userinfo.toString());
     }
 
+    @RequestMapping(value = "/queryAllUserInfo", method = RequestMethod.GET, produces = "application/json")
+    public String queryAllUserInfo(
+        @RequestHeader("thirdSessionKey") String sessionKey) {
+        Debug.Log("Enter queryAllUserInfo");
+        Debug.Log(sessionKey);
+        // Check if session is valid, Get openid from session
+        String openid = sessionService.getValidOpenid(sessionKey);
+        if (openid == null) {
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.SERVER_SESSION_EXPIRED);
+        }
+        UserInfo userinfo = userInfoService.getUserInfoByOpenid(openid);
+        UserInfo.AUTH auth = userinfo.getAuthority();
+        if (!auth.equals(UserInfo.AUTH.ADMIN) && !auth.equals(UserInfo.AUTH.SUPERADMIN)) {
+            return Utility.retmsg(StaticInfo.FORMAT_STATUS, StaticInfo.StatusCode.CLIENT_NOT_AUTHORIZED);
+        }
+
+        List<UserInfo> users = userInfoService.getAllUsers();
+        return Utility.retmsg("{ status: %s, data: %s }", StaticInfo.StatusCode.GENERAL_OK, users.toString());
+    }
+
     @RequestMapping(value = "/setUserinfo", method = RequestMethod.POST, produces = "application/json")
     public String setUserInfo(
         @RequestParam(value = "nickname", required = false) String nickname,

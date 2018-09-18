@@ -92,8 +92,8 @@ public class UserInfo {
 
     @Override
     public String toString() {
-        String format = "{nickName: %s, realName: %s, state: %d, point: %d, authority: %d, voicePart: %d}";
-        String info = String.format(format, this.nickName, this.realName, this.state.ordinal(), this.point, this.authority.ordinal(), this.voicePart.ordinal());
+        String format = "{id: %s, nickName: %s, realName: %s, state: %d, point: %d, authority: %d, voicePart: %d}";
+        String info = String.format(format, this.id, this.nickName, this.realName, this.state.ordinal(), this.point, this.authority.ordinal(), this.voicePart.ordinal());
         return info;
     }
 }

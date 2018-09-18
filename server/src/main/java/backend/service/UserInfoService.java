@@ -72,6 +72,29 @@ public class UserInfoService {
         return users;
     }
 
+    /* not used now, to reduce network traffic
+    public List<UserInfo> getAllAdminUsers() {
+        Query query = new Query();
+        Criteria criteria = Criteria.where("authority").gte(UserInfo.AUTH.ADMIN);
+        query.addCriteria(criteria);
+        List<UserInfo> users = mongoTemplate.find(query, UserInfo.class);
+        return users;
+    }
+
+    public List<UserInfo> getAllNormalUsers() {
+        Query query = new Query();
+        Criteria criteria = Criteria.where("authority").lt(UserInfo.AUTH.ADMIN);
+        query.addCriteria(criteria);
+        List<UserInfo> users = mongoTemplate.find(query, UserInfo.class);
+        return users;
+    }
+    */
+
+    public List<UserInfo> getAllUsers() {
+        List<UserInfo> users = userInfoRepository.findAll();
+        return users;
+    }
+
     public UserInfo getAllRecordByOpenid(String openid) {
         Query query = new Query(Criteria.where("openid").is(openid));
         query.fields().include("record");
