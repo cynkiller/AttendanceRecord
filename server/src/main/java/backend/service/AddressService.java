@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import backend.repo.AddressRepository;
 import backend.service.RehearsalService;
 import backend.util.Debug;
+import backend.util.StaticInfo;
 import backend.model.Address;
 
 @Configuration
@@ -39,6 +40,27 @@ public class AddressService {
             return addr.getId();
         else
             return null;
+    }
+
+    public Boolean createDefaultAddress() {
+        // Check if address database is empty
+        Query query = new Query();
+        Address addr = mongoTemplate.findOne(query, Address.class);
+        if ( addr == null) {
+            // new server, no address exist, create default one
+            addr = new Address();
+            addr.setLocation(StaticInfo.DEFAULT_ADDRESS_LOCATION);
+            addr.setAddress(StaticInfo.DEFAULT_ADDRESS_ADDRESS);
+            addr.setLongtitude(StaticInfo.DEFAULT_ADDRESS_LONGTITUDE);
+            addr.setLatitude(StaticInfo.DEFAULT_ADDRESS_LATITUDE);
+            if (saveNewAddress(addr) ) {
+                // create failed
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
     public Boolean saveNewAddress(String _loc, String _addr, double _long, double _lati) {

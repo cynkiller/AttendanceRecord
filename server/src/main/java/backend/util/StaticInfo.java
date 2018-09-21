@@ -27,7 +27,7 @@ public class StaticInfo {
     public static int DEFAULT_POINT = 30;
     public static UserInfo.STATE DEFAULT_STATE = UserInfo.STATE.MEMBER;
     public static UserInfo.AUTH DEFAULT_AUTH = UserInfo.AUTH.MEMBER;
-    public static Long DEFAULT_ADDR_ID = 3l; // TBD
+    public static Long DEFAULT_ADDR_ID = 1l; // TBD
     public static String DEFAULT_EVENT = "Rehearsal";
     public static HashMap<UserInfo.ATTEND, Integer> strategy = new HashMap<UserInfo.ATTEND, Integer>() {
         {
@@ -40,4 +40,10 @@ public class StaticInfo {
     };
     public static Integer DEFAULT_REMAIN_POINT = 99999;
     public static int DEFAULT_PUNCHIN_TIME = 30 * 60 * 1000; // punch in started 30 minutes before rehearsal started
+
+    public static String DEFAULT_ADDRESS_LOCATION = "location";
+    public static String DEFAULT_ADDRESS_ADDRESS = "address";
+    public static Double DEFAULT_ADDRESS_LONGTITUDE = 121.0;
+    public static Double DEFAULT_ADDRESS_LATITUDE = 31.0;
+
 }

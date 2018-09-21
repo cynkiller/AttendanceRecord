@@ -2,6 +2,8 @@ package backend.task;
 
 import java.util.List;
 
+import com.mongodb.util.Util;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Configurable;
 import backend.service.RehearsalService;
 import backend.service.UserInfoService;
+import backend.service.AddressService;
 import backend.model.Rehearsal;
 import backend.model.UserInfo;
 import backend.util.Debug;
@@ -24,13 +27,17 @@ public class RehearsalTask implements Runnable {
 
     private RehearsalService rehearsalService;
 
+    private AddressService addressService;
+
     private UserInfoService userInfoService;
 
-    public RehearsalTask(String name, RehearsalService r, UserInfoService u) {
+    public RehearsalTask(String name, RehearsalService r, AddressService a, UserInfoService u) {
         threadName = name;
         rehearsalService = r;
+        addressService = a;
         userInfoService = u;
         Debug.Log("rehearsalService: ", r.toString());
+        Debug.Log("addressService: ", a.toString());
         Debug.Log("userInfoService: ", u.toString());
     }
 
@@ -43,6 +50,12 @@ public class RehearsalTask implements Runnable {
         if (users == null || users.isEmpty()) return;
 
         Rehearsal lastRehearsal = rehearsalService.getLastRehearsal();
+        if (lastRehearsal == null) {
+            // server initing
+            Debug.Log("No rehearsal record exists. Server initing..");
+            return;
+        }
+
         Long rehearsalId = lastRehearsal.getId();
 
         for ( UserInfo user: users) {
@@ -96,6 +109,11 @@ public class RehearsalTask implements Runnable {
     public void run() {
         Debug.Log("Enter BackgroundService.run()");
         Debug.Log("Thread " + threadName);
+
+        // if address book empty, create a default one
+        if (addressService.createDefaultAddress() ) {
+            Debug.Log("Create default address FAILED");
+        }
 
         checkPassedRehearsal();
         // find the latest rehearsal record, see if its endtimestamp is before current timestamp

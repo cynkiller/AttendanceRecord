@@ -21,6 +21,9 @@ public class BackgroundService implements SchedulingConfigurer{
     private RehearsalService rehearsalService;
 
     @Autowired
+    private AddressService addressService;
+
+    @Autowired
     private UserInfoService userInfoService;
 
     @Override
@@ -38,7 +41,7 @@ public class BackgroundService implements SchedulingConfigurer{
         taskRegistrar.setScheduler(taskScheduler);
 		//taskScheduler.schedule(new BackgroundService("Set Next Rehearsal Information"), new CronTrigger("0 13 * * 6 ?")); // Saturday 13:00
         //BackgroundService bs = new BackgroundService("Set Next Rehearsal Information");
-        RehearsalTask rt = new RehearsalTask("RehearsalTask", rehearsalService, userInfoService);
+        RehearsalTask rt = new RehearsalTask("RehearsalTask", rehearsalService, addressService, userInfoService);
         //taskScheduler.schedule(rt, new CronTrigger("0 13 * * * ?")); // Every day at 13:00
         taskRegistrar.addCronTask(rt, "0 0 * * * ?");
         rt.run();
